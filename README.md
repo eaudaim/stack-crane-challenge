@@ -56,6 +56,19 @@ python src/batch/batch_generate.py --no-audio
 Les paramètres généraux (dimensions, durée, vitesses, palettes…) sont définis dans `src/config.py` et peuvent être ajustés
 selon vos besoins.
 
+### Test d'empilage simple
+
+Un script dédié permet de générer rapidement une courte vidéo de diagnostic avec
+deux blocs qui tombent au même endroit. Cela aide à vérifier visuellement que
+l'empilage fonctionne correctement :
+
+```bash
+python -m src.debug.simple_stack_test
+```
+
+Le fichier `output/stack_test.mp4` résultant devrait montrer les deux blocs se
+poser l'un sur l'autre.
+
 ## Tests
 
 Une suite de tests basée sur `pytest` est fournie. Pour l'exécuter :

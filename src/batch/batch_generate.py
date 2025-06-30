@@ -7,6 +7,7 @@ import random
 import pygame
 import pymunk
 import numpy as np
+from pydub import AudioSegment
 
 from .. import config
 from ..physics_sim import space_builder, block
@@ -15,7 +16,7 @@ from ..audio import sound_manager
 from ..video_export import moviepy_exporter
 
 
-def generate_once(index: int, assets, sounds) -> None:
+def generate_once(index: int, assets, sounds=None) -> None:
     """Generate a single video with random parameters."""
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
     space = space_builder.init_space()
@@ -38,14 +39,17 @@ def generate_once(index: int, assets, sounds) -> None:
             arr = pygame.surfarray.array3d(screen)
             arr = np.transpose(arr, (1, 0, 2))
         frames.append(arr)
-    audio = sound_manager.mix_tracks(config.DURATION, events, sounds)
+    if sounds:
+        audio = sound_manager.mix_tracks(config.DURATION, events, sounds)
+    else:
+        audio = AudioSegment.silent(duration=config.DURATION * 1000)
     output = os.path.join(config.OUTPUT_DIR, f"run_{index}.mp4")
     moviepy_exporter.export_video(frames, audio, output)
 
 
-def main(count: int) -> None:
+def main(count: int, with_audio: bool = True) -> None:
     assets = pygame_renderer.load_assets()
-    sounds = sound_manager.load_sounds()
+    sounds = sound_manager.load_sounds() if with_audio else None
     for i in range(count):
         generate_once(i, assets, sounds)
 
@@ -53,5 +57,6 @@ def main(count: int) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Batch generate crane videos")
     parser.add_argument("--count", type=int, default=1)
+    parser.add_argument("--no-audio", action="store_true", help="Disable sound track generation")
     args = parser.parse_args()
-    main(args.count)
+    main(args.count, not args.no_audio)

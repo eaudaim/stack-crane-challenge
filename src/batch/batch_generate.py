@@ -1,0 +1,57 @@
+"""Batch generation of crane challenge videos."""
+
+import argparse
+import os
+import random
+
+import pygame
+import pymunk
+import numpy as np
+
+from .. import config
+from ..physics_sim import space_builder, block
+from ..renderer import pygame_renderer, overlays
+from ..audio import sound_manager
+from ..video_export import moviepy_exporter
+
+
+def generate_once(index: int, assets, sounds) -> None:
+    """Generate a single video with random parameters."""
+    os.makedirs(config.OUTPUT_DIR, exist_ok=True)
+    space = space_builder.init_space()
+    screen = pygame.Surface((config.WIDTH, config.HEIGHT))
+    frames = []
+    events = []
+    block_count = random.randint(*config.BLOCK_COUNT_RANGE)
+    sky = random.choice(config.SKY_OPTIONS)
+    crane_x = config.WIDTH // 2
+    for i in range(config.DURATION * config.FPS):
+        t = i / config.FPS
+        dynamic_bodies = [b for b in space.bodies if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC]
+        if len(dynamic_bodies) < block_count and i % (config.FPS * 2) == 0:
+            block.create_block(space, crane_x, 150, random.choice(list(assets["blocks"].keys())))
+            events.append((t, "impact"))
+        space.step(1 / config.FPS)
+        arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
+        if i < config.FPS * 2:
+            overlays.draw_intro(screen)
+            arr = pygame.surfarray.array3d(screen)
+            arr = np.transpose(arr, (1, 0, 2))
+        frames.append(arr)
+    audio = sound_manager.mix_tracks(config.DURATION, events, sounds)
+    output = os.path.join(config.OUTPUT_DIR, f"run_{index}.mp4")
+    moviepy_exporter.export_video(frames, audio, output)
+
+
+def main(count: int) -> None:
+    assets = pygame_renderer.load_assets()
+    sounds = sound_manager.load_sounds()
+    for i in range(count):
+        generate_once(i, assets, sounds)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Batch generate crane videos")
+    parser.add_argument("--count", type=int, default=1)
+    args = parser.parse_args()
+    main(args.count)

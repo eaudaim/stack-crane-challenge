@@ -14,6 +14,11 @@ def create_block(space: pymunk.Space, x: float, y: float, variant: str,
     body = pymunk.Body(mass, moment)
     body.position = x, y
     shape = pymunk.Poly.create_box(body, (width, height))
+
+    # NEW: debug logs for hitbox
+    print(f"Bloc créé - Taille: {width}x{height}")
+    print(f"Vertices de la hitbox: {shape.get_vertices()}")
+    print(f"Aire de la shape: {shape.area}")
     shape.friction = 0.7
     shape.elasticity = 0.1
     # ensure the block participates in collisions

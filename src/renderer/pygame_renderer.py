@@ -49,6 +49,18 @@ def render_frame(surface: pygame.Surface, space, assets, crane_x: float, sky_nam
     for body in space.bodies:
         if isinstance(body, pymunk.Body) and body.body_type != pymunk.Body.DYNAMIC:
             continue
+
+        # NEW: draw physical hitboxes in red for debug purposes
+        for shape in body.shapes:
+            if isinstance(shape, pymunk.Poly):
+                vertices = []
+                for v in shape.get_vertices():
+                    x, y = v.rotated(body.angle) + body.position
+                    py_y = config.HEIGHT - int(y)
+                    vertices.append((int(x), py_y))
+                if len(vertices) > 2:
+                    pygame.draw.polygon(surface, (255, 0, 0), vertices, 2)
+
         variant = getattr(body, "variant", None)
         if variant and variant in assets["blocks"]:
             img = assets["blocks"][variant]

@@ -21,6 +21,23 @@ def run(output: str = os.path.join(config.OUTPUT_DIR, "stack_test.mp4"), seconds
     crane_x = config.WIDTH // 2
     drop_y = config.HEIGHT - config.CRANE_DROP_HEIGHT
     block_variant = next(iter(assets["blocks"]))
+
+    # NEW: create two blocks manually for collision diagnostics
+    block1 = block.create_block(space, 540, 100, block_variant)
+    block2 = block.create_block(space, 540, 200, block_variant)
+
+    print(f"Block1 position: {block1.position}")
+    print(f"Block2 position: {block2.position}")
+
+    block_height = 100  # assuming default size
+    for step in range(10):
+        space.step(1 / config.FPS)
+        print(f"Step {step}: Block1={block1.position}, Block2={block2.position}")
+        b1_top = block1.position.y + block_height / 2
+        b2_bottom = block2.position.y - block_height / 2
+        touching = b2_bottom <= b1_top
+        print(f"  Touching: {touching}")
+
     drop_frames = [config.FPS, config.FPS * 3]
     total_frames = seconds * config.FPS
 

@@ -6,8 +6,14 @@ import pymunk
 from .. import config
 
 
-def create_block(space: pymunk.Space, x: float, y: float, variant: str,
-                 mass: float = 5.0, size: Tuple[int, int] = (200, 100)) -> pymunk.Body:
+def create_block(
+    space: pymunk.Space,
+    x: float,
+    y: float,
+    variant: str = "block.png",
+    mass: float = 5.0,
+    size: Tuple[int, int] = (200, 100),
+) -> pymunk.Body:
     """Create a dynamic block body and add it to the space."""
     width, height = size
     moment = pymunk.moment_for_box(mass, (width, height))

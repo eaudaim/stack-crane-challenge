@@ -20,7 +20,8 @@ def run(output: str = os.path.join(config.OUTPUT_DIR, "stack_test.mp4"), seconds
 
     crane_x = config.WIDTH // 2
     drop_y = config.HEIGHT - config.CRANE_DROP_HEIGHT
-    block_variant = next(iter(assets["blocks"]))
+    # Force usage of the main block texture for clarity
+    block_variant = "block.png"
 
     # NEW: create two blocks manually for collision diagnostics
     block1 = block.create_block(space, 540, 100, block_variant)

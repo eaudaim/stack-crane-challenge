@@ -16,7 +16,12 @@ def create_block(space: pymunk.Space, x: float, y: float, variant: str,
     shape = pymunk.Poly.create_box(body, (width, height))
     shape.friction = 0.7
     shape.elasticity = 0.1
-    # store variant to render corresponding image
+    # ensure the block participates in collisions
+    shape.collision_type = 1
+    shape.group = 0
+
+    # store variant to render the corresponding image
     body.variant = variant
+
     space.add(body, shape)
     return body

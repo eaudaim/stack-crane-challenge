@@ -28,6 +28,9 @@ def run(output: str = os.path.join(config.OUTPUT_DIR, "stack_test.mp4"), seconds
     for i in range(total_frames):
         if i in drop_frames:
             block.create_block(space, crane_x, drop_y, block_variant)
+            print(f"Bloc créé à ({crane_x}, {drop_y})")
+            print(f"Nombre de bodies: {len(space.bodies)}")
+            print(f"Nombre de shapes: {len(space.shapes)}")
         space.step(1 / config.FPS)
         arr = pygame_renderer.render_frame(screen, space, assets, crane_x, "skyline_day.png")
         frames.append(arr)

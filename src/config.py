@@ -7,8 +7,29 @@ HEIGHT = 1920
 FPS = 30
 DURATION = 60  # seconds
 
-BLOCK_COUNT_RANGE = (10, 20)  # number of floors per video
-GRUE_SPEED_RANGE = (150, 300)  # pixels per second
+# Number of blocks that may be dropped in a single video
+BLOCK_COUNT_RANGE = (10, 20)
+
+# Speed of the moving crane in pixels per second
+GRUE_SPEED_RANGE = (50, 120)
+
+# Height from the bottom of the screen where blocks are spawned
+CRANE_DROP_HEIGHT = 150
+
+# Horizontal margin used for crane movement limits
+CRANE_MOVEMENT_BOUNDS = 200
+
+# Random variation applied to the drop X position
+DROP_VARIATION_RANGE = (-30, 30)
+
+# Offset for the hook relative to the top of the crane bar
+HOOK_Y_OFFSET = 80
+
+# Vertical position of the crane bar itself
+CRANE_BAR_Y = 0
+
+# Delay between consecutive block drops in seconds
+BLOCK_DROP_INTERVAL = 2
 
 # Available color palettes for overlays or effects
 PALETTES = {

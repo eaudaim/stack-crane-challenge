@@ -26,12 +26,22 @@ def generate_once(index: int, assets, sounds=None) -> None:
     block_count = random.randint(*config.BLOCK_COUNT_RANGE)
     sky = random.choice(config.SKY_OPTIONS)
     crane_x = config.WIDTH // 2
+    crane_speed = random.randint(*config.GRUE_SPEED_RANGE)
+    crane_dir = 1
     for i in range(config.DURATION * config.FPS):
         t = i / config.FPS
         dynamic_bodies = [b for b in space.bodies if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC]
-        if len(dynamic_bodies) < block_count and i % (config.FPS * 2) == 0:
-            block.create_block(space, crane_x, 150, random.choice(list(assets["blocks"].keys())))
+        if len(dynamic_bodies) < block_count and i % (config.FPS * config.BLOCK_DROP_INTERVAL) == 0:
+            drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
+            block.create_block(space, drop_x, config.HEIGHT - config.CRANE_DROP_HEIGHT, random.choice(list(assets["blocks"].keys())))
             events.append((t, "impact"))
+        crane_x += crane_dir * crane_speed / config.FPS
+        if crane_x > config.WIDTH - config.CRANE_MOVEMENT_BOUNDS:
+            crane_x = config.WIDTH - config.CRANE_MOVEMENT_BOUNDS
+            crane_dir = -1
+        elif crane_x < config.CRANE_MOVEMENT_BOUNDS:
+            crane_x = config.CRANE_MOVEMENT_BOUNDS
+            crane_dir = 1
         space.step(1 / config.FPS)
         arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
         if i < config.FPS * 2:

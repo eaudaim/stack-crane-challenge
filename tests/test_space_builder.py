@@ -8,4 +8,4 @@ from src.physics_sim import space_builder
 
 def test_space_has_gravity():
     space = space_builder.init_space()
-    assert space.gravity == (0, 900)
+    assert space.gravity == (0, -900)

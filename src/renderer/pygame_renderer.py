@@ -38,9 +38,14 @@ def load_assets() -> Dict[str, pygame.Surface]:
 def render_frame(surface: pygame.Surface, space, assets, crane_x: float, sky_name: str) -> np.ndarray:
     """Render a single frame and return it as a numpy array."""
     surface.blit(assets["sky"][sky_name], (0, 0))
-    surface.blit(assets["crane_bar"], (0, 0))
+    bar_img = assets["crane_bar"]
+    if bar_img.get_width() != config.WIDTH:
+        bar_img = pygame.transform.scale(bar_img, (config.WIDTH, bar_img.get_height()))
+    surface.blit(bar_img, (0, config.CRANE_BAR_Y))
+
     hook_img = assets["hook"]
-    surface.blit(hook_img, (crane_x - hook_img.get_width() // 2, 80))
+    hook_y = config.CRANE_BAR_Y + config.HOOK_Y_OFFSET
+    surface.blit(hook_img, (crane_x - hook_img.get_width() // 2, hook_y))
     for body in space.bodies:
         if isinstance(body, pymunk.Body) and body.body_type != pymunk.Body.DYNAMIC:
             continue
@@ -48,7 +53,10 @@ def render_frame(surface: pygame.Surface, space, assets, crane_x: float, sky_nam
         if variant and variant in assets["blocks"]:
             img = assets["blocks"][variant]
             x, y = body.position
-            rect = img.get_rect(center=(int(x), int(y)))
+            # Convert from Pymunk's bottom-left origin to Pygame's top-left
+            # coordinate system.
+            py_y = config.HEIGHT - int(y)
+            rect = img.get_rect(center=(int(x), py_y))
             surface.blit(img, rect)
     arr = pygame.surfarray.array3d(surface)
     return np.transpose(arr, (1, 0, 2))

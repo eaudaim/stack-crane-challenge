@@ -47,6 +47,12 @@ vidéos produire en appelant directement le script :
 python src/batch/batch_generate.py --count 5
 ```
 
+Vous pouvez désactiver la bande son avec l'option `--no-audio` :
+
+```bash
+python src/batch/batch_generate.py --no-audio
+```
+
 Les paramètres généraux (dimensions, durée, vitesses, palettes…) sont définis dans `src/config.py` et peuvent être ajustés
 selon vos besoins.
 

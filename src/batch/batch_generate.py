@@ -79,6 +79,15 @@ def generate_once(index: int, assets, sounds=None) -> None:
         handler.post_solve = log_impact
 
     variant_history: deque = deque(maxlen=2)
+
+    # Render a short intro sequence before starting the simulation
+    for _ in range(config.INTRO_DURATION * config.FPS):
+        pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
+        overlays.draw_intro(screen)
+        arr = pygame.surfarray.array3d(screen)
+        arr = np.transpose(arr, (1, 0, 2))
+        frames.append(arr)
+
     for i in range(config.TIME_LIMIT * config.FPS):
         t = i / config.FPS
         remaining = config.TIME_LIMIT - t
@@ -133,8 +142,6 @@ def generate_once(index: int, assets, sounds=None) -> None:
             crane_dir = 1
         pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
         overlays.draw_timer(screen, remaining)
-        if i < config.FPS * 2:
-            overlays.draw_intro(screen)
         arr = pygame.surfarray.array3d(screen)
         arr = np.transpose(arr, (1, 0, 2))
         frames.append(arr)
@@ -157,7 +164,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
         arr = np.transpose(arr, (1, 0, 2))
         frames.append(arr)
 
-    duration = config.TIME_LIMIT + 2
+    duration = config.INTRO_DURATION + config.TIME_LIMIT + 2
     if sounds:
         audio = sound_manager.mix_tracks(duration, events, sounds)
     else:

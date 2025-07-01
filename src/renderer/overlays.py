@@ -8,14 +8,23 @@ from .. import config
 
 pygame.font.init()
 
-def draw_intro(surface: pygame.Surface, text: str = "PEUT-IL FINIR CETTE TOUR EN 60s ?") -> None:
-    """Draw an intro overlay text on the given surface."""
-    font = pygame.font.Font(None, 72)
-    rendered = font.render(text, True, config.PALETTES["default"]["text"])
-    shadow = font.render(text, True, config.PALETTES["default"]["shadow"])
+
+def draw_intro(surface: pygame.Surface, text: str | None = None) -> None:
+    """Draw the intro text using the style defined in :mod:`config`."""
+    if text is None:
+        text = config.INTRO_TEXT
+    style = config.INTRO_STYLE
+    font = pygame.font.Font(None, style.get("font_size", 72))
+    font.set_bold(True)
+    palette = config.PALETTES.get(style.get("palette", "default"), {})
+    text_color = palette.get("text", (255, 255, 255))
+    shadow_color = palette.get("shadow", (0, 0, 0))
+    rendered = font.render(text, True, text_color)
+    shadow = font.render(text, True, shadow_color)
     x = (config.WIDTH - rendered.get_width()) // 2
-    y = config.HEIGHT // 3
-    surface.blit(shadow, (x + 2, y + 2))
+    y = style.get("y_pos", config.HEIGHT // 3)
+    dx, dy = style.get("shadow_offset", (2, 2))
+    surface.blit(shadow, (x + dx, y + dy))
     surface.blit(rendered, (x, y))
 
 

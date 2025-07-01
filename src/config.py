@@ -5,10 +5,13 @@ import os
 WIDTH = 1080
 HEIGHT = 1920
 FPS = 30
-DURATION = 32  # seconds
+# Duration of the initial intro screen shown before the simulation starts
+INTRO_DURATION = 3  # seconds
 # Number of seconds before the challenge ends. If the tower has not
 # reached the required height after this duration, the run is a failure.
 TIME_LIMIT = 30
+# Total clip duration used when exporting the final video
+DURATION = INTRO_DURATION + TIME_LIMIT + 2
 
 # Pixel dimensions of a block sprite and its corresponding physics body
 BLOCK_SIZE = (350, 150)
@@ -55,6 +58,17 @@ PALETTES = {
         "text": (255, 255, 255),
         "shadow": (0, 0, 0),
     }
+}
+
+# Text shown at the beginning of the video and its styling options
+INTRO_TEXT = "PEUT-IL FINIR CETTE TOUR EN 60s ?"
+INTRO_STYLE = {
+    "font_size": 120,
+    # Vertical position of the text. A value closer to 0 means higher on screen
+    "y_pos": HEIGHT // 4,
+    "shadow_offset": (4, 4),
+    # Palette key used for text and shadow colors
+    "palette": "default",
 }
 
 # Sky backgrounds available in assets/sky

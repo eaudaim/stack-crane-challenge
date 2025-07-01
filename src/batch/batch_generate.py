@@ -52,7 +52,10 @@ def generate_once(index: int, assets, sounds=None) -> None:
     # Track the current simulation time so collision callbacks can timestamp
     # impact events accurately. The value will be updated each frame before
     # stepping the space.
-    sim_time = {"t": 0.0}
+    # ``sim_time`` tracks the absolute time in the final clip. This starts at
+    # ``INTRO_DURATION`` so that all logged audio events line up with the video
+    # frames once the intro sequence has played.
+    sim_time = {"t": float(config.INTRO_DURATION)}
     prev_second = config.TIME_LIMIT + 1
     final_remaining = None
 
@@ -94,7 +97,9 @@ def generate_once(index: int, assets, sounds=None) -> None:
         secs = int(math.ceil(remaining))
         if secs < prev_second:
             if 0 < secs <= 5:
-                events.append((t, "timer"))
+                # Offset the timer event by the intro duration so it matches
+                # the absolute timestamp used for audio mixing.
+                events.append((config.INTRO_DURATION + t, "timer"))
             prev_second = secs
         dynamic_bodies = [
             b
@@ -115,8 +120,10 @@ def generate_once(index: int, assets, sounds=None) -> None:
                 block_variant,
             )
         # Advance the simulation before checking the tower height so that newly
-        # spawned blocks do not immediately trigger a win.
-        sim_time["t"] = (i + 1) / config.FPS
+        # spawned blocks do not immediately trigger a win. ``sim_time`` is
+        # updated with the intro offset so audio timestamps remain consistent
+        # with the rendered frames.
+        sim_time["t"] = config.INTRO_DURATION + (i + 1) / config.FPS
         space.step(1 / config.FPS)
 
         if state is None:
@@ -131,7 +138,10 @@ def generate_once(index: int, assets, sounds=None) -> None:
                 if top >= spawn_y:
                     state = "victory"
                     events.append((sim_time["t"], "victory"))
-                    final_remaining = max(0.0, config.TIME_LIMIT - sim_time["t"])
+                    # ``sim_time`` includes the intro offset, so remove it when
+                    # computing the remaining challenge time.
+                    remaining_challenge = sim_time["t"] - config.INTRO_DURATION
+                    final_remaining = max(0.0, config.TIME_LIMIT - remaining_challenge)
                     break
         crane_x += crane_dir * crane_speed / config.FPS
         if crane_x > config.WIDTH - config.CRANE_MOVEMENT_BOUNDS:

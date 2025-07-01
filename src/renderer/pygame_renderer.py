@@ -31,7 +31,10 @@ def load_assets() -> Dict[str, pygame.Surface]:
     assets["blocks"] = {}
     for file in os.listdir(config.ASSET_PATHS["block"]):
         if file.endswith(".png"):
-            assets["blocks"][file] = pygame.image.load(os.path.join(config.ASSET_PATHS["block"], file)).convert_alpha()
+            img = pygame.image.load(os.path.join(config.ASSET_PATHS["block"], file)).convert_alpha()
+            if img.get_size() != config.BLOCK_SIZE:
+                img = pygame.transform.smoothscale(img, config.BLOCK_SIZE)
+            assets["blocks"][file] = img
     return assets
 
 

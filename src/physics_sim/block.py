@@ -12,7 +12,7 @@ def create_block(
     y: float,
     variant: str = "block.png",
     mass: float = 5.0,
-    size: Tuple[int, int] = (200, 100),
+    size: Tuple[int, int] = config.BLOCK_SIZE,
 ) -> pymunk.Body:
     """Create a dynamic block body and add it to the space."""
     width, height = size

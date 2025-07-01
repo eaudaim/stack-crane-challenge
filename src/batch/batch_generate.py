@@ -38,8 +38,14 @@ def generate_once(index: int, assets, sounds=None) -> None:
         events.append((sim_time["t"], "impact"))
         return True
 
-    handler = space.add_default_collision_handler()
-    handler.begin = log_impact
+    if hasattr(space, "on_collision"):
+        # Pymunk >= 7 uses the on_collision API instead of
+        # add_default_collision_handler. Passing ``None`` for both
+        # collision types registers a global handler.
+        space.on_collision(begin=log_impact)
+    else:  # pragma: no cover - legacy pymunk
+        handler = space.add_default_collision_handler()
+        handler.begin = log_impact
 
     for i in range(config.DURATION * config.FPS):
         t = i / config.FPS

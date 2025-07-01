@@ -14,11 +14,11 @@ TIME_LIMIT = 30
 DURATION = INTRO_DURATION + TIME_LIMIT + 3
 
 # Pixel dimensions of a block sprite and its corresponding physics body
-BLOCK_SIZE = (350, 150)
+BLOCK_SIZE = (300, 250)
 
 # Time a resting block without another block placed on top
 # remains before disappearing through the floor (seconds)
-BLOCK_DESPAWN_DELAY = 4
+BLOCK_DESPAWN_DELAY = 3
 
 # Vertical position of the floor segment used in the physics space
 FLOOR_Y = 10
@@ -29,6 +29,7 @@ BLOCK_VARIANTS = [
     "block.png",
     "block_variant1.png",
     "block_variant2.png",
+    "block_variant3.png",
 ]
 
 # Number of blocks that may be dropped in a single video
@@ -139,13 +140,14 @@ INTRO_STYLE = {
     "y_pos": HEIGHT // 4,
     "shadow_offset": (4, 4),
     # Palette key used for text and shadow colors
-    "palette": "default",
+    "palette": "neon",
 }
 
 # Sky backgrounds available in assets/sky
 SKY_OPTIONS = [
     "skyline_day.png",
     "skyline_night.png",
+    "skyline_dusk.png",
 ]
 
 ASSET_PATHS = {

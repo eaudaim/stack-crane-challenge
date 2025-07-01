@@ -53,11 +53,69 @@ CRANE_BAR_Y = -389
 BLOCK_DROP_INTERVAL = 2
 
 # Available color palettes for overlays or effects
+# "timer" is identical to the countdown timer colors. Additional palettes can be
+# used for styling the intro text with various looks.
 PALETTES = {
     "default": {
         "text": (255, 255, 255),
         "shadow": (0, 0, 0),
-    }
+    },
+    # Same white text with black shadow as the timer
+    "timer": {
+        "text": (255, 255, 255),
+        "shadow": (0, 0, 0),
+    },
+    # Green on black retro computer style
+    "retro": {
+        "text": (0, 255, 0),
+        "shadow": (0, 0, 0),
+    },
+    # Magenta text with cyan shadow for a neon effect
+    "neon": {
+        "text": (255, 0, 255),
+        "shadow": (0, 255, 255),
+    },
+    # Yellow text with dark blue shadow reminiscent of comic books
+    "comic": {
+        "text": (255, 255, 0),
+        "shadow": (0, 0, 128),
+    },
+}
+
+# Predefined intro styles combining fonts, colors and shadow offsets
+INTRO_STYLES = {
+    # Matches the countdown timer appearance
+    "timer": {
+        "font_name": None,  # default font
+        "font_size": 120,
+        "y_pos": HEIGHT // 4,
+        "shadow_offset": (2, 2),
+        "palette": "timer",
+    },
+    # A green retro terminal look
+    "retro": {
+        "font_name": "courier",
+        "font_size": 100,
+        "y_pos": HEIGHT // 4,
+        "shadow_offset": (4, 4),
+        "palette": "retro",
+    },
+    # Bright neon colors with a larger shadow
+    "neon": {
+        "font_name": "arial",
+        "font_size": 110,
+        "y_pos": HEIGHT // 4,
+        "shadow_offset": (6, 6),
+        "palette": "neon",
+    },
+    # Comic style using Comic Sans and contrasting shadow
+    "comic": {
+        "font_name": "comicsansms",
+        "font_size": 120,
+        "y_pos": HEIGHT // 4,
+        "shadow_offset": (5, 5),
+        "palette": "comic",
+    },
 }
 
 # Text shown at the beginning of the video and its styling options

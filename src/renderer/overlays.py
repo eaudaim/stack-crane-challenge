@@ -1,6 +1,7 @@
 """Helpers for drawing text overlays."""
 
 import pygame
+import math
 
 from .. import config
 
@@ -38,3 +39,17 @@ def draw_victory(surface: pygame.Surface) -> None:
 def draw_fail(surface: pygame.Surface) -> None:
     """Display the failure message."""
     _draw_centered(surface, "Perdu", (255, 0, 0))
+
+
+def draw_timer(surface: pygame.Surface, remaining: float) -> None:
+    """Draw the countdown timer in the top left corner."""
+
+    secs = max(0, math.ceil(remaining))
+    color = (255, 0, 0) if secs <= 10 else config.PALETTES["default"]["text"]
+    font = pygame.font.Font(None, 120)
+    font.set_bold(True)
+    text = str(secs)
+    rendered = font.render(text, True, color)
+    shadow = font.render(text, True, config.PALETTES["default"]["shadow"])
+    surface.blit(shadow, (12, 12))
+    surface.blit(rendered, (10, 10))

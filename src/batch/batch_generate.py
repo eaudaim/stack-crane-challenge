@@ -3,6 +3,7 @@
 import argparse
 import os
 import random
+import math
 from collections import deque
 
 
@@ -52,6 +53,8 @@ def generate_once(index: int, assets, sounds=None) -> None:
     # impact events accurately. The value will be updated each frame before
     # stepping the space.
     sim_time = {"t": 0.0}
+    prev_second = config.TIME_LIMIT + 1
+    final_remaining = None
 
     IMPACT_THRESHOLD = 300
 
@@ -78,6 +81,12 @@ def generate_once(index: int, assets, sounds=None) -> None:
     variant_history: deque = deque(maxlen=2)
     for i in range(config.TIME_LIMIT * config.FPS):
         t = i / config.FPS
+        remaining = config.TIME_LIMIT - t
+        secs = int(math.ceil(remaining))
+        if secs < prev_second:
+            if 0 < secs <= 5:
+                events.append((t, "timer"))
+            prev_second = secs
         dynamic_bodies = [
             b
             for b in space.bodies
@@ -113,6 +122,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
                 if top >= spawn_y:
                     state = "victory"
                     events.append((sim_time["t"], "victory"))
+                    final_remaining = max(0.0, config.TIME_LIMIT - sim_time["t"])
                     break
         crane_x += crane_dir * crane_speed / config.FPS
         if crane_x > config.WIDTH - config.CRANE_MOVEMENT_BOUNDS:
@@ -122,6 +132,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
             crane_x = config.CRANE_MOVEMENT_BOUNDS
             crane_dir = 1
         arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
+        overlays.draw_timer(screen, remaining)
         if i < config.FPS * 2:
             overlays.draw_intro(screen)
             arr = pygame.surfarray.array3d(screen)
@@ -129,12 +140,15 @@ def generate_once(index: int, assets, sounds=None) -> None:
         frames.append(arr)
     if state is None:
         state = "fail"
+        final_remaining = 0
         events.append((sim_time["t"], "fail"))
 
     for _ in range(config.FPS * 2):
         sim_time["t"] += 1 / config.FPS
         space.step(1 / config.FPS)
         arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
+        show_remaining = 0 if final_remaining is None else final_remaining
+        overlays.draw_timer(screen, show_remaining)
         if state == "victory":
             overlays.draw_victory(screen)
         else:

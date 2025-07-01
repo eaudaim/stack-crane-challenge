@@ -11,3 +11,4 @@ def test_basic_constants():
     assert isinstance(config.SKY_OPTIONS, list)
     assert config.BLOCK_DROP_INTERVAL > 0
     assert 0 <= config.BLOCK_DROP_JITTER < config.BLOCK_DROP_INTERVAL
+    assert config.BLOCK_DESPAWN_DELAY > 0

@@ -84,6 +84,8 @@ def generate_once(index: int, assets, sounds=None) -> None:
         handler.post_solve = log_impact
 
     variant_history: deque = deque(maxlen=2)
+    unsupported: dict[pymunk.Body, float] = {}
+    falling_blocks: set[pymunk.Body] = set()
 
     # Render a short intro sequence before starting the simulation
     for _ in range(config.INTRO_DURATION * config.FPS):
@@ -103,11 +105,6 @@ def generate_once(index: int, assets, sounds=None) -> None:
                 # the absolute timestamp used for audio mixing.
                 events.append((config.INTRO_DURATION + t, "timer"))
             prev_second = secs
-        dynamic_bodies = [
-            b
-            for b in space.bodies
-            if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC
-        ]
         if state is None and t >= next_drop_time:
             drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
             block_variant = choose_block_variant(
@@ -132,20 +129,51 @@ def generate_once(index: int, assets, sounds=None) -> None:
         sim_time["t"] = config.INTRO_DURATION + (i + 1) / config.FPS
         space.step(1 / config.FPS)
 
+        dynamic_bodies = [
+            b
+            for b in space.bodies
+            if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC
+        ]
+        resting = [b for b in dynamic_bodies if abs(b.velocity.y) < 1]
+
+        def _has_block_on_top(body):
+            bb = list(body.shapes)[0].bb
+            for other in dynamic_bodies:
+                if other is body:
+                    continue
+                obb = list(other.shapes)[0].bb
+                if (
+                    obb.bottom > bb.top - 5
+                    and obb.bottom < bb.top + config.BLOCK_SIZE[1] / 2
+                    and obb.right > bb.left + 10
+                    and obb.left < bb.right - 10
+                ):
+                    return True
+            return False
+
+        for b in resting:
+            if _has_block_on_top(b):
+                unsupported[b] = 0.0
+            else:
+                unsupported[b] = unsupported.get(b, 0.0) + 1 / config.FPS
+                if unsupported[b] >= config.BLOCK_DESPAWN_DELAY:
+                    for s in b.shapes:
+                        s.sensor = True
+                    b.velocity = (0, -300)
+                    falling_blocks.add(b)
+
+        for b in list(falling_blocks):
+            if b.position.y < -config.BLOCK_SIZE[1]:
+                space.remove(b, *b.shapes)
+                falling_blocks.remove(b)
+                unsupported.pop(b, None)
+
         if state is None:
-            dynamic_bodies = [
-                b
-                for b in space.bodies
-                if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC
-            ]
-            resting = [b for b in dynamic_bodies if abs(b.velocity.y) < 1]
             if resting:
                 top = max(b.position.y + config.BLOCK_SIZE[1] / 2 for b in resting)
                 if top >= spawn_y:
                     state = "victory"
                     events.append((sim_time["t"], "victory"))
-                    # ``sim_time`` includes the intro offset, so remove it when
-                    # computing the remaining challenge time.
                     remaining_challenge = sim_time["t"] - config.INTRO_DURATION
                     final_remaining = max(0.0, config.TIME_LIMIT - remaining_challenge)
                     break

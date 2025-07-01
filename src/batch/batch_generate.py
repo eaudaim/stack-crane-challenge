@@ -33,12 +33,12 @@ def generate_once(index: int, assets, sounds=None) -> None:
         dynamic_bodies = [b for b in space.bodies if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC]
         if len(dynamic_bodies) < block_count and i % (config.FPS * config.BLOCK_DROP_INTERVAL) == 0:
             drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
-            # Always use the main block texture instead of random variants
+            block_variant = random.choice(config.BLOCK_VARIANTS)
             block.create_block(
                 space,
                 drop_x,
                 config.HEIGHT - config.CRANE_DROP_HEIGHT,
-                "block.png",
+                block_variant,
             )
             events.append((t, "impact"))
         crane_x += crane_dir * crane_speed / config.FPS

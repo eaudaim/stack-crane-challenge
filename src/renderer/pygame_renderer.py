@@ -30,14 +30,16 @@ def load_assets() -> Dict[str, pygame.Surface]:
     assets["crane_bar"] = pygame.image.load(os.path.join(config.ASSET_PATHS["crane"], "crane_bar.png")).convert_alpha()
     assets["hook"] = pygame.image.load(os.path.join(config.ASSET_PATHS["crane"], "hook.png")).convert_alpha()
 
-    # load block variants lazily
+    # load block variants defined in config
     assets["blocks"] = {}
-    for file in os.listdir(config.ASSET_PATHS["block"]):
-        if file.endswith(".png"):
-            img = pygame.image.load(os.path.join(config.ASSET_PATHS["block"], file)).convert_alpha()
-            if img.get_size() != config.BLOCK_SIZE:
-                img = pygame.transform.smoothscale(img, config.BLOCK_SIZE)
-            assets["blocks"][file] = img
+    for file in config.BLOCK_VARIANTS:
+        path = os.path.join(config.ASSET_PATHS["block"], file)
+        if not os.path.exists(path):
+            continue
+        img = pygame.image.load(path).convert_alpha()
+        if img.get_size() != config.BLOCK_SIZE:
+            img = pygame.transform.smoothscale(img, config.BLOCK_SIZE)
+        assets["blocks"][file] = img
     return assets
 
 

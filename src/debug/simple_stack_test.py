@@ -3,6 +3,7 @@
 import os
 
 import pygame
+import random
 from pydub import AudioSegment
 
 from .. import config
@@ -20,8 +21,7 @@ def run(output: str = os.path.join(config.OUTPUT_DIR, "stack_test.mp4"), seconds
 
     crane_x = config.WIDTH // 2
     drop_y = config.HEIGHT - config.CRANE_DROP_HEIGHT
-    # Force usage of the main block texture for clarity
-    block_variant = "block.png"
+    block_variant = random.choice(config.BLOCK_VARIANTS)
 
     # NEW: create two blocks manually for collision diagnostics
     block1 = block.create_block(space, 540, 100, block_variant)
@@ -45,7 +45,7 @@ def run(output: str = os.path.join(config.OUTPUT_DIR, "stack_test.mp4"), seconds
     frames = []
     for i in range(total_frames):
         if i in drop_frames:
-            block.create_block(space, crane_x, drop_y, block_variant)
+            block.create_block(space, crane_x, drop_y, random.choice(config.BLOCK_VARIANTS))
             print(f"Bloc créé à ({crane_x}, {drop_y})")
             print(f"Nombre de bodies: {len(space.bodies)}")
             print(f"Nombre de shapes: {len(space.shapes)}")

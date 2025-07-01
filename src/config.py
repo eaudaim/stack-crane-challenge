@@ -11,7 +11,7 @@ INTRO_DURATION = 3  # seconds
 # reached the required height after this duration, the run is a failure.
 TIME_LIMIT = 30
 # Total clip duration used when exporting the final video
-DURATION = INTRO_DURATION + TIME_LIMIT + 2
+DURATION = INTRO_DURATION + TIME_LIMIT + 3
 
 # Pixel dimensions of a block sprite and its corresponding physics body
 BLOCK_SIZE = (350, 150)
@@ -61,9 +61,9 @@ PALETTES = {
 }
 
 # Text shown at the beginning of the video and its styling options
-INTRO_TEXT = "PEUT-IL FINIR CETTE TOUR EN 60s ?"
+INTRO_TEXT = "TERMINE CETTE TOUR EN 60s"
 INTRO_STYLE = {
-    "font_size": 120,
+    "font_size": 100,
     # Vertical position of the text. A value closer to 0 means higher on screen
     "y_pos": HEIGHT // 4,
     "shadow_offset": (4, 4),

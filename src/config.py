@@ -26,10 +26,14 @@ CRANE_MOVEMENT_BOUNDS = 200
 DROP_VARIATION_RANGE = (-30, 30)
 
 # Offset for the hook relative to the top of the crane bar
-HOOK_Y_OFFSET = 80
+# The crane_bar asset contains a large transparent margin above the
+# visible bar. To keep the hook 80px below the visible bar despite
+# this margin, we compensate here (394px transparent head).
+HOOK_Y_OFFSET = 474
 
-# Vertical position of the crane bar itself
-CRANE_BAR_Y = 0
+# Vertical position of the crane bar itself. We shift it upward so the
+# visible bar sits only a few pixels from the top of the window.
+CRANE_BAR_Y = -389
 
 # Delay between consecutive block drops in seconds
 BLOCK_DROP_INTERVAL = 2

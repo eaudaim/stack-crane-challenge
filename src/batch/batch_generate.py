@@ -35,19 +35,24 @@ def generate_once(index: int, assets, sounds=None) -> None:
     # stepping the space.
     sim_time = {"t": 0.0}
 
+    IMPACT_THRESHOLD = 300
+
     def log_impact(arbiter, space_, data):
-        """Collision callback used to record impact sounds."""
-        events.append((sim_time["t"], "impact"))
+        """Record an impact if the collision is strong enough."""
+        impulse = getattr(arbiter, "total_impulse", None)
+        strength = impulse.length if impulse is not None else 0
+        if strength >= IMPACT_THRESHOLD:
+            events.append((sim_time["t"], "impact"))
         return True
 
     if hasattr(space, "on_collision"):
         # Pymunk >= 7 uses the on_collision API instead of
         # add_default_collision_handler. Passing ``None`` for both
         # collision types registers a global handler.
-        space.on_collision(begin=log_impact)
+        space.on_collision(post_solve=log_impact)
     else:  # pragma: no cover - legacy pymunk
         handler = space.add_default_collision_handler()
-        handler.begin = log_impact
+        handler.post_solve = log_impact
 
     for i in range(config.TIME_LIMIT * config.FPS):
         t = i / config.FPS

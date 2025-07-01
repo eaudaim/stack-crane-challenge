@@ -9,12 +9,23 @@ from .. import config
 pygame.font.init()
 
 
-def draw_intro(surface: pygame.Surface, text: str | None = None) -> None:
-    """Draw the intro text using the style defined in :mod:`config`."""
+def draw_intro(surface: pygame.Surface, text: str | None = None, style_name: str | None = None) -> None:
+    """Draw the intro text using the style defined in :mod:`config`.
+
+    ``style_name`` can be one of the keys defined in ``config.INTRO_STYLES`` to
+    pick an alternate appearance.
+    """
     if text is None:
         text = config.INTRO_TEXT
-    style = config.INTRO_STYLE
-    font = pygame.font.Font(None, style.get("font_size", 72))
+    if style_name is not None:
+        style = config.INTRO_STYLES.get(style_name, config.INTRO_STYLE)
+    else:
+        style = config.INTRO_STYLE
+    font_name = style.get("font_name")
+    if font_name:
+        font = pygame.font.SysFont(font_name, style.get("font_size", 72))
+    else:
+        font = pygame.font.Font(None, style.get("font_size", 72))
     font.set_bold(True)
     palette = config.PALETTES.get(style.get("palette", "default"), {})
     text_color = palette.get("text", (255, 255, 255))

@@ -20,6 +20,9 @@ BLOCK_SIZE = (350, 150)
 # remains before disappearing through the floor (seconds)
 BLOCK_DESPAWN_DELAY = 4
 
+# Vertical position of the floor segment used in the physics space
+FLOOR_Y = 10
+
 
 # Different textures that can be used for the falling blocks
 BLOCK_VARIANTS = [

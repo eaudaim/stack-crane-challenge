@@ -156,7 +156,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
 
         def _is_on_floor(body):
             bb = list(body.shapes)[0].bb
-            return bb.bottom <= config.FLOOR_Y + 1
+            return bb.bottom <= config.FLOOR_Y + 5
 
         def _is_tilted(body):
             angle = abs(body.angle % math.pi)
@@ -165,8 +165,13 @@ def generate_once(index: int, assets, sounds=None) -> None:
             return angle > config.BLOCK_SIDE_ANGLE
 
         for b in resting:
-            if (
+            protected_first = (
                 b is first_block
+                and _is_on_floor(b)
+                and not _has_block_on_top(b)
+            )
+            if (
+                protected_first
                 or (not _is_on_floor(b) and not _is_tilted(b))
                 or _has_block_on_top(b)
             ):

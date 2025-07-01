@@ -3,6 +3,24 @@
 import argparse
 import os
 import random
+from collections import deque
+
+
+def choose_block_variant(variants, history: deque) -> str:
+    """Return a variant avoiding long consecutive repeats."""
+    if len(variants) <= 1:
+        choice = variants[0]
+    else:
+        # Exclude variant if it already appears twice consecutively
+        banned = None
+        if len(history) >= 2 and history[-1] == history[-2]:
+            banned = history[-1]
+        available = [v for v in variants if v != banned] if banned else variants
+        choice = random.choice(available)
+    history.append(choice)
+    if len(history) > 2:
+        history.popleft()
+    return choice
 
 import pygame
 import pymunk
@@ -57,6 +75,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
         handler = space.add_default_collision_handler()
         handler.post_solve = log_impact
 
+    variant_history: deque = deque(maxlen=2)
     for i in range(config.TIME_LIMIT * config.FPS):
         t = i / config.FPS
         dynamic_bodies = [
@@ -70,7 +89,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
             and i % (config.FPS * config.BLOCK_DROP_INTERVAL) == 0
         ):
             drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
-            block_variant = random.choice(config.BLOCK_VARIANTS)
+            block_variant = choose_block_variant(config.BLOCK_VARIANTS, variant_history)
             block.create_block(
                 space,
                 drop_x,

@@ -55,6 +55,9 @@ python src/batch/batch_generate.py --no-audio
 
 Les paramètres généraux (dimensions, durée, vitesses, palettes…) sont définis dans `src/config.py` et peuvent être ajustés
 selon vos besoins.
+Un paramètre `BLOCK_DROP_JITTER` permet également d'introduire une légère
+variabilité dans l'intervalle entre deux chutes de bloc pour rendre l'action
+moins prévisible.
 
 ### Test d'empilage simple
 

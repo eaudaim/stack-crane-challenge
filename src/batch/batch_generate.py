@@ -42,7 +42,6 @@ def generate_once(index: int, assets, sounds=None) -> None:
     screen = pygame.Surface((config.WIDTH, config.HEIGHT))
     frames = []
     events = []
-    block_count = random.randint(*config.BLOCK_COUNT_RANGE)
     sky = random.choice(config.SKY_OPTIONS)
     crane_x = config.WIDTH // 2
     crane_speed = random.randint(*config.GRUE_SPEED_RANGE)
@@ -58,6 +57,9 @@ def generate_once(index: int, assets, sounds=None) -> None:
     sim_time = {"t": float(config.INTRO_DURATION)}
     prev_second = config.TIME_LIMIT + 1
     final_remaining = None
+
+    # Next time (in seconds) a new block should be dropped
+    next_drop_time = 0.0
 
     IMPACT_THRESHOLD = 300
 
@@ -106,19 +108,23 @@ def generate_once(index: int, assets, sounds=None) -> None:
             for b in space.bodies
             if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC
         ]
-        if (
-            state is None
-            and len(dynamic_bodies) < block_count
-            and i % (config.FPS * config.BLOCK_DROP_INTERVAL) == 0
-        ):
+        if state is None and t >= next_drop_time:
             drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
-            block_variant = choose_block_variant(config.BLOCK_VARIANTS, variant_history)
+            block_variant = choose_block_variant(
+                config.BLOCK_VARIANTS, variant_history
+            )
             block.create_block(
                 space,
                 drop_x,
                 config.HEIGHT - config.CRANE_DROP_HEIGHT,
                 block_variant,
             )
+            delay = config.BLOCK_DROP_INTERVAL + random.uniform(
+                -config.BLOCK_DROP_JITTER,
+                config.BLOCK_DROP_JITTER,
+            )
+            delay = max(0.5, delay)
+            next_drop_time = t + delay
         # Advance the simulation before checking the tower height so that newly
         # spawned blocks do not immediately trigger a win. ``sim_time`` is
         # updated with the intro offset so audio timestamps remain consistent

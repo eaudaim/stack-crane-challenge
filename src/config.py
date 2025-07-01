@@ -5,31 +5,31 @@ import os
 WIDTH = 1080
 HEIGHT = 1920
 FPS = 30
-DURATION = 60  # seconds
+DURATION = 8  # seconds
 
 # Pixel dimensions of a block sprite and its corresponding physics body
-BLOCK_SIZE = (200, 100)
+BLOCK_SIZE = (350, 150)
 
 # Number of blocks that may be dropped in a single video
 BLOCK_COUNT_RANGE = (10, 20)
 
 # Speed of the moving crane in pixels per second
-GRUE_SPEED_RANGE = (50, 120)
+GRUE_SPEED_RANGE = (80, 120)
 
 # Height from the bottom of the screen where blocks are spawned
-CRANE_DROP_HEIGHT = 150
+CRANE_DROP_HEIGHT = 580
 
 # Horizontal margin used for crane movement limits
 CRANE_MOVEMENT_BOUNDS = 200
 
 # Random variation applied to the drop X position
-DROP_VARIATION_RANGE = (-30, 30)
+DROP_VARIATION_RANGE = (-10, 10)
 
 # Offset for the hook relative to the top of the crane bar
 # The crane_bar asset contains a large transparent margin above the
 # visible bar. To keep the hook 80px below the visible bar despite
 # this margin, we compensate here (394px transparent head).
-HOOK_Y_OFFSET = 474
+HOOK_Y_OFFSET = 400
 
 # Vertical position of the crane bar itself. We shift it upward so the
 # visible bar sits only a few pixels from the top of the window.

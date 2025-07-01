@@ -41,7 +41,10 @@ def generate_once(index: int, assets, sounds=None) -> None:
         """Record an impact if the collision is strong enough."""
         impulse = getattr(arbiter, "total_impulse", None)
         strength = impulse.length if impulse is not None else 0
-        if strength >= IMPACT_THRESHOLD:
+
+        # Avoid spamming impact sounds when bodies remain in contact
+        first_contact = getattr(arbiter, "is_first_contact", False)
+        if first_contact and strength >= IMPACT_THRESHOLD:
             events.append((sim_time["t"], "impact"))
         return True
 

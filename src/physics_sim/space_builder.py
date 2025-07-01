@@ -17,8 +17,10 @@ def init_space() -> pymunk.Space:
     # was placed at ``HEIGHT - 10`` which corresponds to the top edge when using
     # Pymunk's coordinate system.  Moving it near ``y=10`` allows the blocks to
     # properly land and stack on screen.
-    floor_y = 10
-    floor = pymunk.Segment(space.static_body, (0, floor_y), (config.WIDTH, floor_y), 5)
+    floor_y = config.FLOOR_Y
+    floor = pymunk.Segment(
+        space.static_body, (0, floor_y), (config.WIDTH, floor_y), 5
+    )
     floor.friction = 1.0
     space.add(floor)
     return space

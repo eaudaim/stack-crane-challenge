@@ -86,6 +86,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
     variant_history: deque = deque(maxlen=2)
     unsupported: dict[pymunk.Body, float] = {}
     falling_blocks: set[pymunk.Body] = set()
+    first_block: pymunk.Body | None = None
 
     # Render a short intro sequence before starting the simulation
     for _ in range(config.INTRO_DURATION * config.FPS):
@@ -110,12 +111,14 @@ def generate_once(index: int, assets, sounds=None) -> None:
             block_variant = choose_block_variant(
                 config.BLOCK_VARIANTS, variant_history
             )
-            block.create_block(
+            new_block = block.create_block(
                 space,
                 drop_x,
                 config.HEIGHT - config.CRANE_DROP_HEIGHT,
                 block_variant,
             )
+            if first_block is None:
+                first_block = new_block
             delay = config.BLOCK_DROP_INTERVAL + random.uniform(
                 -config.BLOCK_DROP_JITTER,
                 config.BLOCK_DROP_JITTER,
@@ -151,16 +154,21 @@ def generate_once(index: int, assets, sounds=None) -> None:
                     return True
             return False
 
+        def _is_on_floor(body):
+            bb = list(body.shapes)[0].bb
+            return bb.bottom <= config.FLOOR_Y + 1
+
         for b in resting:
-            if _has_block_on_top(b):
+            if b is first_block or not _is_on_floor(b) or _has_block_on_top(b):
                 unsupported[b] = 0.0
-            else:
-                unsupported[b] = unsupported.get(b, 0.0) + 1 / config.FPS
-                if unsupported[b] >= config.BLOCK_DESPAWN_DELAY:
-                    for s in b.shapes:
-                        s.sensor = True
-                    b.velocity = (0, -300)
-                    falling_blocks.add(b)
+                continue
+
+            unsupported[b] = unsupported.get(b, 0.0) + 1 / config.FPS
+            if unsupported[b] >= config.BLOCK_DESPAWN_DELAY:
+                for s in b.shapes:
+                    s.sensor = True
+                b.velocity = (0, -300)
+                falling_blocks.add(b)
 
         for b in list(falling_blocks):
             if b.position.y < -config.BLOCK_SIZE[1]:

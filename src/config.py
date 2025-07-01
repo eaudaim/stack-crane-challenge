@@ -5,7 +5,7 @@ import os
 WIDTH = 1080
 HEIGHT = 1920
 FPS = 30
-DURATION = 30  # seconds
+DURATION = 32  # seconds
 # Number of seconds before the challenge ends. If the tower has not
 # reached the required height after this duration, the run is a failure.
 TIME_LIMIT = 30
@@ -31,7 +31,7 @@ GRUE_SPEED_RANGE = (80, 120)
 CRANE_DROP_HEIGHT = 580
 
 # Horizontal margin used for crane movement limits
-CRANE_MOVEMENT_BOUNDS = 200
+CRANE_MOVEMENT_BOUNDS = 440
 
 # Random variation applied to the drop X position
 DROP_VARIATION_RANGE = (-10, 10)

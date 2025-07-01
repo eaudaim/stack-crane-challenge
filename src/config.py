@@ -16,6 +16,10 @@ DURATION = INTRO_DURATION + TIME_LIMIT + 3
 # Pixel dimensions of a block sprite and its corresponding physics body
 BLOCK_SIZE = (350, 150)
 
+# Time a resting block without another block placed on top
+# remains before disappearing through the floor (seconds)
+BLOCK_DESPAWN_DELAY = 4
+
 
 # Different textures that can be used for the falling blocks
 BLOCK_VARIANTS = [

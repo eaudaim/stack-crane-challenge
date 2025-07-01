@@ -28,6 +28,19 @@ def generate_once(index: int, assets, sounds=None) -> None:
     crane_x = config.WIDTH // 2
     crane_speed = random.randint(*config.GRUE_SPEED_RANGE)
     crane_dir = 1
+    # Track the current simulation time so collision callbacks can timestamp
+    # impact events accurately. The value will be updated each frame before
+    # stepping the space.
+    sim_time = {"t": 0.0}
+
+    def log_impact(arbiter, space_, data):
+        """Collision callback used to record impact sounds."""
+        events.append((sim_time["t"], "impact"))
+        return True
+
+    handler = space.add_default_collision_handler()
+    handler.begin = log_impact
+
     for i in range(config.DURATION * config.FPS):
         t = i / config.FPS
         dynamic_bodies = [b for b in space.bodies if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC]
@@ -40,7 +53,6 @@ def generate_once(index: int, assets, sounds=None) -> None:
                 config.HEIGHT - config.CRANE_DROP_HEIGHT,
                 block_variant,
             )
-            events.append((t, "impact"))
         crane_x += crane_dir * crane_speed / config.FPS
         if crane_x > config.WIDTH - config.CRANE_MOVEMENT_BOUNDS:
             crane_x = config.WIDTH - config.CRANE_MOVEMENT_BOUNDS
@@ -48,6 +60,10 @@ def generate_once(index: int, assets, sounds=None) -> None:
         elif crane_x < config.CRANE_MOVEMENT_BOUNDS:
             crane_x = config.CRANE_MOVEMENT_BOUNDS
             crane_dir = 1
+        # Set the time that will correspond to events generated during this
+        # physics step. Collisions happening within the step are stamped with
+        # the time at the end of the step to match the rendered frame.
+        sim_time["t"] = (i + 1) / config.FPS
         space.step(1 / config.FPS)
         arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
         if i < config.FPS * 2:

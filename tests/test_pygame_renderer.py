@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 import numpy as np
 import pygame
+import math
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -22,3 +23,9 @@ def test_render_frame_shape(tmp_path):
     surface = pygame.Surface((1080, 1920))
     arr = pygame_renderer.render_frame(surface, space, assets, 540, "skyline_day.png")
     assert arr.shape[0] == 1920 and arr.shape[1] == 1080
+
+
+def test_rotate_surface_swaps_dimensions():
+    img = pygame.Surface((10, 20))
+    rotated = pygame_renderer.rotate_surface(img, math.pi / 2)
+    assert rotated.get_size() == (20, 10)

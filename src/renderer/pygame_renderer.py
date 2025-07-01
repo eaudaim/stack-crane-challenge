@@ -1,6 +1,7 @@
 """Headless Pygame renderer for the challenge."""
 
 from typing import Dict
+import math
 import os
 
 import pygame
@@ -40,6 +41,12 @@ def load_assets() -> Dict[str, pygame.Surface]:
     return assets
 
 
+def rotate_surface(img: pygame.Surface, angle_rad: float) -> pygame.Surface:
+    """Return a new surface rotated to match the given body angle."""
+    angle_deg = -math.degrees(angle_rad)
+    return pygame.transform.rotate(img, angle_deg)
+
+
 def render_frame(surface: pygame.Surface, space, assets, crane_x: float, sky_name: str) -> np.ndarray:
     """Render a single frame and return it as a numpy array."""
     surface.blit(assets["sky"][sky_name], (0, 0))
@@ -58,7 +65,8 @@ def render_frame(surface: pygame.Surface, space, assets, crane_x: float, sky_nam
 
         variant = getattr(body, "variant", None)
         if variant and variant in assets["blocks"]:
-            img = assets["blocks"][variant]
+            base_img = assets["blocks"][variant]
+            img = rotate_surface(base_img, body.angle)
             x, y = body.position
             # Convert from Pymunk's bottom-left origin to Pygame's top-left
             # coordinate system.

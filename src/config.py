@@ -20,6 +20,11 @@ BLOCK_SIZE = (350, 150)
 # remains before disappearing through the floor (seconds)
 BLOCK_DESPAWN_DELAY = 4
 
+# Angle (in radians) beyond which a resting block is considered to be
+# "on its side" and should be removed after ``BLOCK_DESPAWN_DELAY``
+# if unsupported.
+BLOCK_SIDE_ANGLE = 0.4
+
 # Vertical position of the floor segment used in the physics space
 FLOOR_Y = 10
 

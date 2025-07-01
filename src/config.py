@@ -31,7 +31,7 @@ GRUE_SPEED_RANGE = (80, 120)
 CRANE_DROP_HEIGHT = 580
 
 # Horizontal margin used for crane movement limits
-CRANE_MOVEMENT_BOUNDS = 440
+CRANE_MOVEMENT_BOUNDS = 340
 
 # Random variation applied to the drop X position
 DROP_VARIATION_RANGE = (-10, 10)

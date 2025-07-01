@@ -50,7 +50,13 @@ HOOK_Y_OFFSET = 400
 CRANE_BAR_Y = -389
 
 # Delay between consecutive block drops in seconds
+# ``BLOCK_DROP_JITTER`` adds a small random variation to each delay.  This
+# prevents the drops from feeling too mechanical without ever producing huge
+# gaps or multiple blocks at the same time.
 BLOCK_DROP_INTERVAL = 2
+# Maximum random variation applied to the drop interval.  The actual delay will
+# be ``BLOCK_DROP_INTERVAL`` plus or minus a value drawn from this range.
+BLOCK_DROP_JITTER = 0.4
 
 # Available color palettes for overlays or effects
 # "timer" is identical to the countdown timer colors. Additional palettes can be

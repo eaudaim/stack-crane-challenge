@@ -10,6 +10,14 @@ DURATION = 30  # seconds
 # Pixel dimensions of a block sprite and its corresponding physics body
 BLOCK_SIZE = (350, 150)
 
+
+# Different textures that can be used for the falling blocks
+BLOCK_VARIANTS = [
+    "block.png",
+    "block_variant1.png",
+    "block_variant2.png",
+]
+
 # Number of blocks that may be dropped in a single video
 BLOCK_COUNT_RANGE = (10, 20)
 

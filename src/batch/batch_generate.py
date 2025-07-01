@@ -28,6 +28,8 @@ def generate_once(index: int, assets, sounds=None) -> None:
     crane_x = config.WIDTH // 2
     crane_speed = random.randint(*config.GRUE_SPEED_RANGE)
     crane_dir = 1
+    spawn_y = config.HEIGHT - config.CRANE_DROP_HEIGHT
+    state = None  # "victory" or "fail"
     # Track the current simulation time so collision callbacks can timestamp
     # impact events accurately. The value will be updated each frame before
     # stepping the space.
@@ -47,10 +49,10 @@ def generate_once(index: int, assets, sounds=None) -> None:
         handler = space.add_default_collision_handler()
         handler.begin = log_impact
 
-    for i in range(config.DURATION * config.FPS):
+    for i in range(config.TIME_LIMIT * config.FPS):
         t = i / config.FPS
         dynamic_bodies = [b for b in space.bodies if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC]
-        if len(dynamic_bodies) < block_count and i % (config.FPS * config.BLOCK_DROP_INTERVAL) == 0:
+        if state is None and len(dynamic_bodies) < block_count and i % (config.FPS * config.BLOCK_DROP_INTERVAL) == 0:
             drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
             block_variant = random.choice(config.BLOCK_VARIANTS)
             block.create_block(
@@ -59,6 +61,12 @@ def generate_once(index: int, assets, sounds=None) -> None:
                 config.HEIGHT - config.CRANE_DROP_HEIGHT,
                 block_variant,
             )
+        if state is None and dynamic_bodies:
+            top = max(b.position.y + config.BLOCK_SIZE[1] / 2 for b in dynamic_bodies)
+            if top >= spawn_y:
+                state = "victory"
+                events.append((sim_time["t"], "victory"))
+                break
         crane_x += crane_dir * crane_speed / config.FPS
         if crane_x > config.WIDTH - config.CRANE_MOVEMENT_BOUNDS:
             crane_x = config.WIDTH - config.CRANE_MOVEMENT_BOUNDS
@@ -77,10 +85,27 @@ def generate_once(index: int, assets, sounds=None) -> None:
             arr = pygame.surfarray.array3d(screen)
             arr = np.transpose(arr, (1, 0, 2))
         frames.append(arr)
+    if state is None:
+        state = "fail"
+        events.append((sim_time["t"], "fail"))
+
+    for _ in range(config.FPS * 2):
+        sim_time["t"] += 1 / config.FPS
+        space.step(1 / config.FPS)
+        arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
+        if state == "victory":
+            overlays.draw_victory(screen)
+        else:
+            overlays.draw_fail(screen)
+        arr = pygame.surfarray.array3d(screen)
+        arr = np.transpose(arr, (1, 0, 2))
+        frames.append(arr)
+
+    duration = config.TIME_LIMIT + 2
     if sounds:
-        audio = sound_manager.mix_tracks(config.DURATION, events, sounds)
+        audio = sound_manager.mix_tracks(duration, events, sounds)
     else:
-        audio = AudioSegment.silent(duration=config.DURATION * 1000)
+        audio = AudioSegment.silent(duration=duration * 1000)
     output = os.path.join(config.OUTPUT_DIR, f"run_{index}.mp4")
     moviepy_exporter.export_video(frames, audio, output)
 

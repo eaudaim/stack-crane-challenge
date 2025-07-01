@@ -6,6 +6,9 @@ WIDTH = 1080
 HEIGHT = 1920
 FPS = 30
 DURATION = 30  # seconds
+# Number of seconds before the challenge ends. If the tower has not
+# reached the required height after this duration, the run is a failure.
+TIME_LIMIT = 30
 
 # Pixel dimensions of a block sprite and its corresponding physics body
 BLOCK_SIZE = (350, 150)

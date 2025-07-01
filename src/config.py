@@ -14,7 +14,7 @@ TIME_LIMIT = 30
 DURATION = INTRO_DURATION + TIME_LIMIT + 3
 
 # Pixel dimensions of a block sprite and its corresponding physics body
-BLOCK_SIZE = (300, 250)
+BLOCK_SIZE = (150, 220)
 
 # Time a resting block without another block placed on top
 # remains before disappearing through the floor (seconds)

@@ -7,6 +7,9 @@ HEIGHT = 1920
 FPS = 30
 DURATION = 60  # seconds
 
+# Pixel dimensions of a block sprite and its corresponding physics body
+BLOCK_SIZE = (200, 100)
+
 # Number of blocks that may be dropped in a single video
 BLOCK_COUNT_RANGE = (10, 20)
 

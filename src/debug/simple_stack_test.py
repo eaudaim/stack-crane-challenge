@@ -30,7 +30,7 @@ def run(output: str = os.path.join(config.OUTPUT_DIR, "stack_test.mp4"), seconds
     print(f"Block1 position: {block1.position}")
     print(f"Block2 position: {block2.position}")
 
-    block_height = 100  # assuming default size
+    block_height = config.BLOCK_SIZE[1]
     for step in range(10):
         space.step(1 / config.FPS)
         print(f"Step {step}: Block1={block1.position}, Block2={block2.position}")

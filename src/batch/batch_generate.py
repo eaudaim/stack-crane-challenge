@@ -131,12 +131,12 @@ def generate_once(index: int, assets, sounds=None) -> None:
         elif crane_x < config.CRANE_MOVEMENT_BOUNDS:
             crane_x = config.CRANE_MOVEMENT_BOUNDS
             crane_dir = 1
-        arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
+        pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
         overlays.draw_timer(screen, remaining)
         if i < config.FPS * 2:
             overlays.draw_intro(screen)
-            arr = pygame.surfarray.array3d(screen)
-            arr = np.transpose(arr, (1, 0, 2))
+        arr = pygame.surfarray.array3d(screen)
+        arr = np.transpose(arr, (1, 0, 2))
         frames.append(arr)
     if state is None:
         state = "fail"

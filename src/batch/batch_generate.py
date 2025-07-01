@@ -51,8 +51,16 @@ def generate_once(index: int, assets, sounds=None) -> None:
 
     for i in range(config.TIME_LIMIT * config.FPS):
         t = i / config.FPS
-        dynamic_bodies = [b for b in space.bodies if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC]
-        if state is None and len(dynamic_bodies) < block_count and i % (config.FPS * config.BLOCK_DROP_INTERVAL) == 0:
+        dynamic_bodies = [
+            b
+            for b in space.bodies
+            if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC
+        ]
+        if (
+            state is None
+            and len(dynamic_bodies) < block_count
+            and i % (config.FPS * config.BLOCK_DROP_INTERVAL) == 0
+        ):
             drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
             block_variant = random.choice(config.BLOCK_VARIANTS)
             block.create_block(
@@ -61,12 +69,24 @@ def generate_once(index: int, assets, sounds=None) -> None:
                 config.HEIGHT - config.CRANE_DROP_HEIGHT,
                 block_variant,
             )
-        if state is None and dynamic_bodies:
-            top = max(b.position.y + config.BLOCK_SIZE[1] / 2 for b in dynamic_bodies)
-            if top >= spawn_y:
-                state = "victory"
-                events.append((sim_time["t"], "victory"))
-                break
+        # Advance the simulation before checking the tower height so that newly
+        # spawned blocks do not immediately trigger a win.
+        sim_time["t"] = (i + 1) / config.FPS
+        space.step(1 / config.FPS)
+
+        if state is None:
+            dynamic_bodies = [
+                b
+                for b in space.bodies
+                if isinstance(b, pymunk.Body) and b.body_type == pymunk.Body.DYNAMIC
+            ]
+            resting = [b for b in dynamic_bodies if abs(b.velocity.y) < 1]
+            if resting:
+                top = max(b.position.y + config.BLOCK_SIZE[1] / 2 for b in resting)
+                if top >= spawn_y:
+                    state = "victory"
+                    events.append((sim_time["t"], "victory"))
+                    break
         crane_x += crane_dir * crane_speed / config.FPS
         if crane_x > config.WIDTH - config.CRANE_MOVEMENT_BOUNDS:
             crane_x = config.WIDTH - config.CRANE_MOVEMENT_BOUNDS
@@ -74,11 +94,6 @@ def generate_once(index: int, assets, sounds=None) -> None:
         elif crane_x < config.CRANE_MOVEMENT_BOUNDS:
             crane_x = config.CRANE_MOVEMENT_BOUNDS
             crane_dir = 1
-        # Set the time that will correspond to events generated during this
-        # physics step. Collisions happening within the step are stamped with
-        # the time at the end of the step to match the rendered frame.
-        sim_time["t"] = (i + 1) / config.FPS
-        space.step(1 / config.FPS)
         arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
         if i < config.FPS * 2:
             overlays.draw_intro(screen)
@@ -120,6 +135,8 @@ def main(count: int, with_audio: bool = True) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Batch generate crane videos")
     parser.add_argument("--count", type=int, default=1)
-    parser.add_argument("--no-audio", action="store_true", help="Disable sound track generation")
+    parser.add_argument(
+        "--no-audio", action="store_true", help="Disable sound track generation"
+    )
     args = parser.parse_args()
     main(args.count, not args.no_audio)

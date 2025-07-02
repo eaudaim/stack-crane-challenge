@@ -84,13 +84,14 @@ def generate_once(index: int, assets, sounds=None) -> None:
         handler.post_solve = log_impact
 
     variant_history: deque = deque(maxlen=2)
+    preview_variant = choose_block_variant(config.BLOCK_VARIANTS, variant_history)
     unsupported: dict[pymunk.Body, float] = {}
     falling_blocks: set[pymunk.Body] = set()
     first_block: pymunk.Body | None = None
 
     # Render a short intro sequence before starting the simulation
     for _ in range(config.INTRO_DURATION * config.FPS):
-        pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
+        pygame_renderer.render_frame(screen, space, assets, crane_x, sky, preview_variant)
         overlays.draw_intro(screen)
         arr = pygame.surfarray.array3d(screen)
         arr = np.transpose(arr, (1, 0, 2))
@@ -108,14 +109,11 @@ def generate_once(index: int, assets, sounds=None) -> None:
             prev_second = secs
         if state is None and t >= next_drop_time:
             drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
-            block_variant = choose_block_variant(
-                config.BLOCK_VARIANTS, variant_history
-            )
             new_block = block.create_block(
                 space,
                 drop_x,
                 config.HEIGHT - config.CRANE_DROP_HEIGHT,
-                block_variant,
+                preview_variant,
             )
             if first_block is None:
                 first_block = new_block
@@ -125,6 +123,10 @@ def generate_once(index: int, assets, sounds=None) -> None:
             )
             delay = max(0.5, delay)
             next_drop_time = t + delay
+            preview_variant = choose_block_variant(
+                config.BLOCK_VARIANTS,
+                variant_history,
+            )
         # Advance the simulation before checking the tower height so that newly
         # spawned blocks do not immediately trigger a win. ``sim_time`` is
         # updated with the intro offset so audio timestamps remain consistent
@@ -209,7 +211,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
         elif crane_x < config.CRANE_MOVEMENT_BOUNDS:
             crane_x = config.CRANE_MOVEMENT_BOUNDS
             crane_dir = 1
-        pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
+        pygame_renderer.render_frame(screen, space, assets, crane_x, sky, preview_variant)
         overlays.draw_timer(screen, remaining)
         arr = pygame.surfarray.array3d(screen)
         arr = np.transpose(arr, (1, 0, 2))
@@ -224,7 +226,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
         space.step(1 / config.FPS)
         space_builder.apply_bug_forces(space)
         space_builder.apply_adhesion_forces(space)
-        arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
+        arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky, None)
         show_remaining = 0 if final_remaining is None else final_remaining
         overlays.draw_timer(screen, show_remaining)
         if state == "victory":

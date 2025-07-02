@@ -49,8 +49,21 @@ def rotate_surface(img: pygame.Surface, angle_rad: float) -> pygame.Surface:
     return pygame.transform.rotate(img, angle_deg)
 
 
-def render_frame(surface: pygame.Surface, space, assets, crane_x: float, sky_name: str) -> np.ndarray:
-    """Render a single frame and return it as a numpy array."""
+def render_frame(
+    surface: pygame.Surface,
+    space,
+    assets,
+    crane_x: float,
+    sky_name: str,
+    preview_variant: str | None = None,
+) -> np.ndarray:
+    """Render a single frame and return it as a numpy array.
+
+    ``preview_variant`` optionally specifies the block variant currently hanging
+    from the crane hook ready to be dropped. When provided, the corresponding
+    sprite is drawn beneath the hook so the upcoming block is visible to the
+    viewer.
+    """
     surface.blit(assets["sky"][sky_name], (0, 0))
     bar_img = assets["crane_bar"]
     if bar_img.get_width() != config.WIDTH:
@@ -60,6 +73,12 @@ def render_frame(surface: pygame.Surface, space, assets, crane_x: float, sky_nam
     hook_img = assets["hook"]
     hook_y = config.CRANE_BAR_Y + config.HOOK_Y_OFFSET
     surface.blit(hook_img, (crane_x - hook_img.get_width() // 2, hook_y))
+    if preview_variant and preview_variant in assets["blocks"]:
+        preview_img = assets["blocks"][preview_variant]
+        # Position the preview so its top touches the bottom of the hook.
+        preview_x = crane_x - preview_img.get_width() // 2
+        preview_y = hook_y + hook_img.get_height() - 5
+        surface.blit(preview_img, (preview_x, preview_y))
     for body in space.bodies:
         if isinstance(body, pymunk.Body) and body.body_type != pymunk.Body.DYNAMIC:
             continue

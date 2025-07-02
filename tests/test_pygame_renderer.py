@@ -21,7 +21,9 @@ def test_render_frame_shape(tmp_path):
     space = space_builder.init_space()
     block.create_block(space, 540, 100, "block.png")
     surface = pygame.Surface((1080, 1920))
-    arr = pygame_renderer.render_frame(surface, space, assets, 540, "skyline_day.png")
+    arr = pygame_renderer.render_frame(
+        surface, space, assets, 540, "skyline_day.png", "block.png"
+    )
     assert arr.shape[0] == 1920 and arr.shape[1] == 1080
 
 

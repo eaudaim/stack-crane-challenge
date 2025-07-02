@@ -162,6 +162,21 @@ PALETTES = {
         "text": (255, 255, 0),
         "shadow": (0, 0, 128),
     },
+    # Style clair sur fond bleu pour le ciel de jour
+    "day": {
+        "text": (255, 255, 255),
+        "shadow": (40, 80, 160),
+    },
+    # Tons chauds pour la fin d'après-midi
+    "dusk": {
+        "text": (255, 220, 180),
+        "shadow": (120, 60, 20),
+    },
+    # Palette cyan lumineuse pour un rendu néon
+    "night": {
+        "text": (100, 255, 255),
+        "shadow": (100, 255, 255),
+    },
 }
 
 # Styles d'intro préconfigurés combinant polices, couleurs et décalages d'ombre
@@ -198,6 +213,33 @@ INTRO_STYLES = {
         "shadow_offset": (5, 5),
         "palette": "comic",
     },
+    # Style sans serif blanc épuré pour la journée
+    "day": {
+        "font_name": "montserratbold",
+        "font_size": 110,
+        "y_pos": HEIGHT // 4,
+        "shadow_offset": (3, 3),
+        "palette": "day",
+        "effect": "flat",
+    },
+    # Style vintage avec Slab Serif pour le crépuscule
+    "dusk": {
+        "font_name": "rockwell",
+        "font_size": 110,
+        "y_pos": HEIGHT // 4,
+        "shadow_offset": (4, 4),
+        "palette": "dusk",
+        "effect": "vintage",
+    },
+    # Style néon accentué pour la nuit
+    "night": {
+        "font_name": "neon tubes",
+        "font_size": 110,
+        "y_pos": HEIGHT // 4,
+        "shadow_offset": (6, 6),
+        "palette": "night",
+        "effect": "neon",
+    },
 }
 
 # Texte affiché au début de la vidéo et ses options de style
@@ -217,6 +259,16 @@ SKY_OPTIONS = [
     "skyline_night.png",
     "skyline_dusk.png",
 ]
+
+# Style de texte associé à chaque fond
+INTRO_STYLE_BY_SKY = {
+    "skyline_day.png": "day",
+    "skyline_dusk.png": "dusk",
+    "skyline_night.png": "night",
+}
+
+# Style à utiliser par défaut si un fond n'a pas d'entrée spécifique
+DEFAULT_INTRO_STYLE_NAME = None
 
 ASSET_PATHS = {
     "sky": os.path.join("assets", "sky"),

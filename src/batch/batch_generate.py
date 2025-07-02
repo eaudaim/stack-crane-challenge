@@ -36,6 +36,40 @@ from ..audio import sound_manager
 from ..video_export import moviepy_exporter
 
 
+def find_connected_tower(resting: list[pymunk.Body], spawn_y: float, space) -> list[pymunk.Body]:
+    """Return all blocks forming the actual tower reaching ``spawn_y``."""
+    margin = 5
+    connected: set[pymunk.Body] = set()
+    queue: deque[pymunk.Body] = deque()
+
+    for body in resting:
+        bb = list(body.shapes)[0].bb
+        if bb.top >= spawn_y:
+            connected.add(body)
+            queue.append(body)
+
+    def _adjacent(a: pymunk.Body, b: pymunk.Body) -> bool:
+        abb = list(a.shapes)[0].bb
+        bbb = list(b.shapes)[0].bb
+        return (
+            abb.left < bbb.right + margin
+            and abb.right > bbb.left - margin
+            and abb.bottom < bbb.top + margin
+            and abb.top > bbb.bottom - margin
+        )
+
+    while queue:
+        current = queue.popleft()
+        for other in resting:
+            if other in connected:
+                continue
+            if _adjacent(current, other):
+                connected.add(other)
+                queue.append(other)
+
+    return list(connected)
+
+
 def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -> None:
     """Generate a single video with random parameters."""
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
@@ -65,6 +99,7 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
     impact_fx: dict[pymunk.Body, float] = {}
     confetti_particles: list[vfx.ConfettiParticle] = []
     glow_time = 0.0
+    glow_blocks: list[pymunk.Body] = []
 
     # Camera effect state
     shake_time = 0.0
@@ -251,6 +286,7 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
                         )
                     )
                     glow_time = config.GLOW_DURATION
+                    glow_blocks = find_connected_tower(resting, spawn_y, space)
                     zoom_time = config.VICTORY_ZOOM_DURATION
                     break
         crane_x = (
@@ -266,6 +302,11 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
             b: (config.IMPACT_FLASH_COLOR, int(config.IMPACT_FLASH_ALPHA * (v / config.IMPACT_FLASH_DURATION)))
             for b, v in impact_fx.items()
         }
+        if glow_time > 0:
+            intensity = int(config.GLOW_ALPHA * glow_time / config.GLOW_DURATION)
+            for b in glow_blocks:
+                if b in space.bodies:
+                    effects[b] = (config.GLOW_COLOR, intensity)
         pygame_renderer.render_frame(
             screen,
             space,
@@ -275,7 +316,6 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
             show_preview,
             block_effects=effects,
             confetti=confetti_particles,
-            glow_alpha=int(config.GLOW_ALPHA * max(0.0, glow_time) / config.GLOW_DURATION),
         )
         overlays.draw_timer(screen, remaining)
 
@@ -324,6 +364,11 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
             b: (config.IMPACT_FLASH_COLOR, int(config.IMPACT_FLASH_ALPHA * (v / config.IMPACT_FLASH_DURATION)))
             for b, v in impact_fx.items()
         }
+        if glow_time > 0:
+            intensity = int(config.GLOW_ALPHA * glow_time / config.GLOW_DURATION)
+            for b in glow_blocks:
+                if b in space.bodies:
+                    effects[b] = (config.GLOW_COLOR, intensity)
         arr = pygame_renderer.render_frame(
             screen,
             space,
@@ -333,7 +378,6 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
             None,
             block_effects=effects,
             confetti=confetti_particles,
-            glow_alpha=int(config.GLOW_ALPHA * max(0.0, glow_time) / config.GLOW_DURATION),
         )
         show_remaining = 0 if final_remaining is None else final_remaining
         overlays.draw_timer(screen, show_remaining)

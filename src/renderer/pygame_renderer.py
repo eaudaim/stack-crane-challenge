@@ -58,7 +58,6 @@ def render_frame(
     preview_variant: str | None = None,
     block_effects: Optional[dict] | None = None,
     confetti: Optional[list] | None = None,
-    glow_alpha: int = 0,
 ) -> np.ndarray:
     """Render a single frame and return it as a numpy array.
 
@@ -109,10 +108,6 @@ def render_frame(
         from . import vfx
         vfx.draw_confetti(surface, confetti)
 
-    if glow_alpha > 0:
-        overlay = pygame.Surface((config.WIDTH, config.HEIGHT), pygame.SRCALPHA)
-        overlay.fill((*config.GLOW_COLOR, glow_alpha))
-        surface.blit(overlay, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
     arr = pygame.surfarray.array3d(surface)
     return np.transpose(arr, (1, 0, 2))
 

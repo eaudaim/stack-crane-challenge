@@ -13,12 +13,14 @@ def create_block(
     variant: str = "block.png",
     mass: float = 5.0,
     size: Tuple[int, int] = config.BLOCK_SIZE,
+    initial_velocity: Tuple[float, float] = (0.0, 0.0),
 ) -> pymunk.Body:
     """Create a dynamic block body and add it to the space."""
     width, height = size
     moment = pymunk.moment_for_box(mass, (width, height))
     body = pymunk.Body(mass, moment)
     body.position = x, y
+    body.velocity = initial_velocity
     shape = pymunk.Poly.create_box(body, (width, height))
 
     # NEW: debug logs for hitbox

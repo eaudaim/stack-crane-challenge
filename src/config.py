@@ -18,7 +18,7 @@ BLOCK_SIZE = (150, 220)
 
 # Time a resting block without another block placed on top
 # remains before disappearing through the floor (seconds)
-BLOCK_DESPAWN_DELAY = 3
+BLOCK_DESPAWN_DELAY = 4.2
 # Toggle automatic removal of unsupported blocks. When set to ``False`` the
 # despawn logic is skipped and all blocks remain present.
 BLOCK_DESPAWN_ENABLED = True
@@ -40,7 +40,7 @@ BUG_SPIN_VELOCITY = 0.0
 # Additional upward/downward attractive force between vertically adjacent blocks.
 # A value of 0 disables the effect. This helps stacked blocks stick together
 # slightly to reduce unwanted sliding.
-BLOCK_ADHESION_FORCE = 0.0
+BLOCK_ADHESION_FORCE = 3
 
 
 # Different textures that can be used for the falling blocks
@@ -63,7 +63,7 @@ GRUE_SPEED_RANGE = (80, 120)
 DROP_HORIZONTAL_SPEED_FACTOR = 1.0
 
 # Height from the bottom of the screen where blocks are spawned
-CRANE_DROP_HEIGHT = 580
+CRANE_DROP_HEIGHT = 635
 # Height from the bottom of the screen where the preview of the next block
 # should be displayed.  By default it matches ``CRANE_DROP_HEIGHT`` so the
 # preview appears exactly where blocks will spawn.

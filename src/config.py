@@ -121,6 +121,7 @@ INTRO_STYLES = {
         "y_pos": HEIGHT // 4,
         "shadow_offset": (2, 2),
         "palette": "timer",
+        "effect": "flat",
     },
     # A green retro terminal look
     "retro": {
@@ -129,6 +130,7 @@ INTRO_STYLES = {
         "y_pos": HEIGHT // 4,
         "shadow_offset": (4, 4),
         "palette": "retro",
+        "effect": "vintage",
     },
     # Bright neon colors with a larger shadow
     "neon": {
@@ -137,6 +139,7 @@ INTRO_STYLES = {
         "y_pos": HEIGHT // 4,
         "shadow_offset": (6, 6),
         "palette": "neon",
+        "effect": "neon",
     },
     # Comic style using Comic Sans and contrasting shadow
     "comic": {
@@ -145,6 +148,7 @@ INTRO_STYLES = {
         "y_pos": HEIGHT // 4,
         "shadow_offset": (5, 5),
         "palette": "comic",
+        "effect": "flat",
     },
 }
 
@@ -157,6 +161,7 @@ INTRO_STYLE = {
     "shadow_offset": (4, 4),
     # Palette key used for text and shadow colors
     "palette": "neon",
+    "effect": "neon",
 }
 
 # Sky backgrounds available in assets/sky

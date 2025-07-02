@@ -226,9 +226,9 @@ OUTPUT_DIR = "output"
 # ============================================================================
 
 # Durée du flash coloré après un impact (secondes)
-IMPACT_FLASH_DURATION = 0.2
+IMPACT_FLASH_DURATION = 0.07
 # Opacité maximale du flash
-IMPACT_FLASH_ALPHA = 200
+IMPACT_FLASH_ALPHA = 80
 # Couleur appliquée lors du flash d'impact
 IMPACT_FLASH_COLOR = (255, 160, 40)
 

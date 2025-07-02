@@ -75,9 +75,10 @@ def render_frame(
     surface.blit(hook_img, (crane_x - hook_img.get_width() // 2, hook_y))
     if preview_variant and preview_variant in assets["blocks"]:
         preview_img = assets["blocks"][preview_variant]
-        # Position the preview so its top touches the bottom of the hook.
+        # Center the preview on the configured preview height so it matches
+        # the spawn position of new blocks.
         preview_x = crane_x - preview_img.get_width() // 2
-        preview_y = hook_y + hook_img.get_height() - 5
+        preview_y = config.PREVIEW_HEIGHT - preview_img.get_height() // 2
         surface.blit(preview_img, (preview_x, preview_y))
     for body in space.bodies:
         if isinstance(body, pymunk.Body) and body.body_type != pymunk.Body.DYNAMIC:

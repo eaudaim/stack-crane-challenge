@@ -24,8 +24,13 @@ def export_video(frames: List[np.ndarray], audio, output_path: str, fps: int = c
         audio.export(temp_wav.name, format="wav")
         audio_clip = AudioFileClip(temp_wav.name)
         try:
-            clip = clip.set_audio(audio_clip)
-        except AttributeError:  # MoviePy >=2.1 uses ``with_audio``
-            clip = clip.with_audio(audio_clip)  # pragma: no cover
-        clip.write_videofile(output_path, codec="libx264", audio_codec="aac")
+            try:
+                clip = clip.set_audio(audio_clip)
+            except AttributeError:  # MoviePy >=2.1 uses ``with_audio``
+                clip = clip.with_audio(audio_clip)  # pragma: no cover
+            clip.write_videofile(output_path, codec="libx264", audio_codec="aac")
+        finally:
+            # Explicitly free MoviePy resources before returning
+            audio_clip.close()
+            clip.close()
     os.unlink(temp_wav.name)

@@ -6,6 +6,8 @@ import random
 import math
 from collections import deque
 import gc
+import subprocess
+import sys
 
 
 def choose_block_variant(variants, history: deque) -> str:
@@ -23,6 +25,7 @@ def choose_block_variant(variants, history: deque) -> str:
     if len(history) > 2:
         history.popleft()
     return choice
+
 
 import pygame
 import pymunk
@@ -112,9 +115,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
             prev_second = secs
         if state is None and t >= next_drop_time:
             drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
-            block_variant = choose_block_variant(
-                config.BLOCK_VARIANTS, variant_history
-            )
+            block_variant = choose_block_variant(config.BLOCK_VARIANTS, variant_history)
             new_block = block.create_block(
                 space,
                 drop_x,
@@ -172,9 +173,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
 
         for b in resting:
             protected_first = (
-                b is first_block
-                and _is_on_floor(b)
-                and not _has_block_on_top(b)
+                b is first_block and _is_on_floor(b) and not _has_block_on_top(b)
             )
             if (
                 protected_first
@@ -251,18 +250,49 @@ def generate_once(index: int, assets, sounds=None) -> None:
     gc.collect()
 
 
-def main(count: int, with_audio: bool = True) -> None:
+def run_single(index: int, with_audio: bool = True) -> None:
+    """Helper invoked in a subprocess to produce a single video."""
     assets = pygame_renderer.load_assets()
     sounds = sound_manager.load_sounds() if with_audio else None
-    for i in range(count):
-        generate_once(i, assets, sounds)
+    generate_once(index, assets, sounds)
+
+
+def main(count: int, with_audio: bool = True, isolate: bool = True) -> None:
+    """Run batch generation, optionally isolating each run in a subprocess."""
+    if isolate:
+        for i in range(count):
+            cmd = [
+                sys.executable,
+                os.path.abspath(__file__),
+                "--single-index",
+                str(i),
+            ]
+            if not with_audio:
+                cmd.append("--no-audio")
+            subprocess.run(cmd, check=True)
+    else:
+        assets = pygame_renderer.load_assets()
+        sounds = sound_manager.load_sounds() if with_audio else None
+        for i in range(count):
+            generate_once(i, assets, sounds)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Batch generate crane videos")
-    parser.add_argument("--count", type=int, default=1)
+    parser.add_argument(
+        "--count", type=int, default=1, help="Number of videos to generate"
+    )
+    parser.add_argument("--single-index", type=int, help=argparse.SUPPRESS)
     parser.add_argument(
         "--no-audio", action="store_true", help="Disable sound track generation"
     )
+    parser.add_argument(
+        "--no-subprocess",
+        action="store_true",
+        help="Run all generations in the current process",
+    )
     args = parser.parse_args()
-    main(args.count, not args.no_audio)
+    if args.single_index is not None:
+        run_single(args.single_index, not args.no_audio)
+    else:
+        main(args.count, not args.no_audio, isolate=not args.no_subprocess)

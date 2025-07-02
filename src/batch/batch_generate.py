@@ -5,6 +5,7 @@ import os
 import random
 import math
 from collections import deque
+import gc
 
 
 def choose_block_variant(variants, history: deque) -> str:
@@ -38,6 +39,9 @@ from ..video_export import moviepy_exporter
 def generate_once(index: int, assets, sounds=None) -> None:
     """Generate a single video with random parameters."""
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
+    # Reinitialise Pygame at the start of each run to ensure a clean state
+    pygame.init()
+    pygame.display.set_mode((1, 1))
     space = space_builder.init_space()
     screen = pygame.Surface((config.WIDTH, config.HEIGHT))
     frames = []
@@ -242,6 +246,9 @@ def generate_once(index: int, assets, sounds=None) -> None:
         audio = AudioSegment.silent(duration=duration * 1000)
     output = os.path.join(config.OUTPUT_DIR, f"run_{index}.mp4")
     moviepy_exporter.export_video(frames, audio, output)
+    # Free Pygame resources and collected memory before the next run
+    pygame.quit()
+    gc.collect()
 
 
 def main(count: int, with_audio: bool = True) -> None:

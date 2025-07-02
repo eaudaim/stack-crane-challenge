@@ -66,6 +66,15 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
     confetti_particles: list[vfx.ConfettiParticle] = []
     glow_time = 0.0
 
+    # Camera effect state
+    shake_time = 0.0
+    zoom_time = 0.0
+    cam_phase = rng.uniform(0, 2 * math.pi)
+    cam_axis = rng.choice(["x", "y"])
+    cam_amp = rng.uniform(*config.CAMERA_OSC_AMPLITUDE_RANGE)
+    cam_freq = rng.uniform(*config.CAMERA_OSC_FREQUENCY_RANGE)
+    cam_t = 0.0
+
     # Next time (in seconds) a new block should be dropped
     next_drop_time = 0.0
 
@@ -73,6 +82,7 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
 
     def log_impact(arbiter, space_, data):
         """Record an impact if the collision is strong enough."""
+        nonlocal shake_time
         impulse = getattr(arbiter, "total_impulse", None)
         strength = impulse.length if impulse is not None else 0
 
@@ -84,6 +94,7 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
                 body = shape.body
                 if body.body_type == pymunk.Body.DYNAMIC:
                     impact_fx[body] = config.IMPACT_FLASH_DURATION
+            shake_time = config.CAMERA_SHAKE_DURATION
         return True
 
     if hasattr(space, "on_collision"):
@@ -240,6 +251,7 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
                         )
                     )
                     glow_time = config.GLOW_DURATION
+                    zoom_time = config.VICTORY_ZOOM_DURATION
                     break
         crane_x = (
             config.WIDTH // 2
@@ -266,7 +278,25 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
             glow_alpha=int(config.GLOW_ALPHA * max(0.0, glow_time) / config.GLOW_DURATION),
         )
         overlays.draw_timer(screen, remaining)
-        arr = pygame.surfarray.array3d(screen)
+
+        base = cam_amp * math.sin(cam_freq * cam_t + cam_phase)
+        offset_x = base if cam_axis == "x" else 0.0
+        offset_y = base if cam_axis == "y" else 0.0
+        if shake_time > 0:
+            strength = shake_time / config.CAMERA_SHAKE_DURATION
+            offset_x += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+            offset_y += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+            shake_time -= 1 / config.FPS
+        zoom = 1.0
+        if zoom_time > 0:
+            progress = 1 - zoom_time / config.VICTORY_ZOOM_DURATION
+            eased = progress * progress * (3 - 2 * progress)
+            zoom = 1 + config.VICTORY_ZOOM_FACTOR * eased
+            zoom_time -= 1 / config.FPS
+        cam_t += 1 / config.FPS
+
+        transformed = pygame_renderer.apply_camera(screen, (offset_x, offset_y), zoom)
+        arr = pygame.surfarray.array3d(transformed)
         arr = np.transpose(arr, (1, 0, 2))
         frames.append(arr)
     if state is None:
@@ -309,7 +339,24 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
             overlays.draw_victory(screen)
         else:
             overlays.draw_fail(screen)
-        arr = pygame.surfarray.array3d(screen)
+        base = cam_amp * math.sin(cam_freq * cam_t + cam_phase)
+        offset_x = base if cam_axis == "x" else 0.0
+        offset_y = base if cam_axis == "y" else 0.0
+        if shake_time > 0:
+            strength = shake_time / config.CAMERA_SHAKE_DURATION
+            offset_x += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+            offset_y += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+            shake_time -= 1 / config.FPS
+        zoom = 1.0
+        if zoom_time > 0:
+            progress = 1 - zoom_time / config.VICTORY_ZOOM_DURATION
+            eased = progress * progress * (3 - 2 * progress)
+            zoom = 1 + config.VICTORY_ZOOM_FACTOR * eased
+            zoom_time -= 1 / config.FPS
+        cam_t += 1 / config.FPS
+
+        transformed = pygame_renderer.apply_camera(screen, (offset_x, offset_y), zoom)
+        arr = pygame.surfarray.array3d(transformed)
         arr = np.transpose(arr, (1, 0, 2))
         frames.append(arr)
 

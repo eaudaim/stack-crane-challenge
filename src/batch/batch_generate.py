@@ -448,22 +448,45 @@ def generate_once(
     moviepy_exporter.export_video(frames, audio, output)
 
 
+def run_single(
+    index: int,
+    with_audio: bool = True,
+    seed: Optional[int] = None,
+    perfect_stack: bool | None = None,
+) -> None:
+    """Load resources and generate a single clip."""
+    assets = pygame_renderer.load_assets()
+    sounds = sound_manager.load_sounds() if with_audio else None
+    generate_once(index, assets, sounds, seed=seed, perfect_stack=perfect_stack)
+
+
 def main(
     count: int,
     with_audio: bool = True,
     seed: Optional[int] = None,
     perfect_stack: bool | None = None,
 ) -> None:
-    assets = pygame_renderer.load_assets()
-    sounds = sound_manager.load_sounds() if with_audio else None
+    """Generate ``count`` videos, isolating each run in a subprocess."""
+    import subprocess
+    import sys
+
     for i in range(count):
         run_seed = None if seed is None else seed + i
-        generate_once(i, assets, sounds, seed=run_seed, perfect_stack=perfect_stack)
+        cmd = [sys.executable, "-m", "src.batch.batch_generate", "--_single", f"--index={i}"]
+        if not with_audio:
+            cmd.append("--no-audio")
+        if run_seed is not None:
+            cmd.extend(["--seed", str(run_seed)])
+        if perfect_stack:
+            cmd.append("--perfect-stack")
+        subprocess.run(cmd, check=True)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Batch generate crane videos")
     parser.add_argument("--count", type=int, default=1)
+    parser.add_argument("--_single", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--index", type=int, default=0, help=argparse.SUPPRESS)
     parser.add_argument(
         "--no-audio", action="store_true", help="Disable sound track generation"
     )
@@ -479,9 +502,17 @@ if __name__ == "__main__":
         help="Empile automatiquement les blocs sans mouvement de grue",
     )
     args = parser.parse_args()
-    main(
-        args.count,
-        not args.no_audio,
-        seed=args.seed,
-        perfect_stack=args.perfect_stack,
-    )
+    if args._single:
+        run_single(
+            args.index,
+            not args.no_audio,
+            seed=args.seed,
+            perfect_stack=args.perfect_stack,
+        )
+    else:
+        main(
+            args.count,
+            not args.no_audio,
+            seed=args.seed,
+            perfect_stack=args.perfect_stack,
+        )

@@ -122,6 +122,9 @@ def generate_once(
     cam_amp = rng.uniform(*config.CAMERA_OSC_AMPLITUDE_RANGE)
     cam_freq = rng.uniform(*config.CAMERA_OSC_FREQUENCY_RANGE)
     cam_t = 0.0
+    freeze_scene = False
+    zoom_pending = False
+    end_loop = False
 
     # Next time (in seconds) a new block should be dropped
     next_drop_time = 0.0
@@ -304,8 +307,9 @@ def generate_once(
                     )
                     glow_time = config.GLOW_DURATION
                     glow_blocks = find_connected_tower(resting, spawn_y, space)
-                    zoom_time = config.VICTORY_ZOOM_DURATION
-                    break
+                    freeze_scene = True
+                    zoom_pending = True
+                    end_loop = True
         crane_x = (
             config.WIDTH // 2
             + amplitude * math.sin(frequency * t + phase)
@@ -339,25 +343,28 @@ def generate_once(
         offset_x = offset_y = 0.0
         zoom = 1.0
         if config.CAMERA_EFFECTS_ENABLED:
-            base = cam_amp * math.sin(cam_freq * cam_t + cam_phase)
-            offset_x = base if cam_axis == "x" else 0.0
-            offset_y = base if cam_axis == "y" else 0.0
-            if shake_time > 0:
-                strength = shake_time / config.CAMERA_SHAKE_DURATION
-                offset_x += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
-                offset_y += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
-                shake_time -= 1 / config.FPS
+            if not freeze_scene:
+                base = cam_amp * math.sin(cam_freq * cam_t + cam_phase)
+                offset_x = base if cam_axis == "x" else 0.0
+                offset_y = base if cam_axis == "y" else 0.0
+                if shake_time > 0:
+                    strength = shake_time / config.CAMERA_SHAKE_DURATION
+                    offset_x += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+                    offset_y += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+                    shake_time -= 1 / config.FPS
+                cam_t += 1 / config.FPS
             if zoom_time > 0:
                 progress = 1 - zoom_time / config.VICTORY_ZOOM_DURATION
                 eased = progress * progress * (3 - 2 * progress)
                 zoom = 1 + config.VICTORY_ZOOM_FACTOR * eased
                 zoom_time -= 1 / config.FPS
-            cam_t += 1 / config.FPS
 
         transformed = pygame_renderer.apply_camera(screen, (offset_x, offset_y), zoom)
         arr = pygame.surfarray.array3d(transformed)
         arr = np.transpose(arr, (1, 0, 2))
         frames.append(arr)
+        if end_loop:
+            break
     if state is None:
         state = "fail"
         final_remaining = 0
@@ -365,17 +372,21 @@ def generate_once(
 
     for _ in range(config.FPS * 2):
         sim_time["t"] += 1 / config.FPS
-        space.step(1 / config.FPS)
-        space_builder.apply_bug_forces(space)
-        space_builder.apply_adhesion_forces(space)
-        for body in list(impact_fx.keys()):
-            impact_fx[body] -= 1 / config.FPS
-            if impact_fx[body] <= 0:
-                impact_fx.pop(body)
+        if not freeze_scene:
+            space.step(1 / config.FPS)
+            space_builder.apply_bug_forces(space)
+            space_builder.apply_adhesion_forces(space)
+            for body in list(impact_fx.keys()):
+                impact_fx[body] -= 1 / config.FPS
+                if impact_fx[body] <= 0:
+                    impact_fx.pop(body)
 
-        vfx.update_confetti(confetti_particles, 1 / config.FPS)
+            vfx.update_confetti(confetti_particles, 1 / config.FPS)
         if glow_time > 0:
             glow_time -= 1 / config.FPS
+        elif zoom_pending:
+            zoom_time = config.VICTORY_ZOOM_DURATION
+            zoom_pending = False
 
         effects = {
             b: (config.IMPACT_FLASH_COLOR, int(config.IMPACT_FLASH_ALPHA * (v / config.IMPACT_FLASH_DURATION)))
@@ -405,20 +416,21 @@ def generate_once(
         offset_x = offset_y = 0.0
         zoom = 1.0
         if config.CAMERA_EFFECTS_ENABLED:
-            base = cam_amp * math.sin(cam_freq * cam_t + cam_phase)
-            offset_x = base if cam_axis == "x" else 0.0
-            offset_y = base if cam_axis == "y" else 0.0
-            if shake_time > 0:
-                strength = shake_time / config.CAMERA_SHAKE_DURATION
-                offset_x += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
-                offset_y += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
-                shake_time -= 1 / config.FPS
+            if not freeze_scene:
+                base = cam_amp * math.sin(cam_freq * cam_t + cam_phase)
+                offset_x = base if cam_axis == "x" else 0.0
+                offset_y = base if cam_axis == "y" else 0.0
+                if shake_time > 0:
+                    strength = shake_time / config.CAMERA_SHAKE_DURATION
+                    offset_x += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+                    offset_y += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+                    shake_time -= 1 / config.FPS
+                cam_t += 1 / config.FPS
             if zoom_time > 0:
                 progress = 1 - zoom_time / config.VICTORY_ZOOM_DURATION
                 eased = progress * progress * (3 - 2 * progress)
                 zoom = 1 + config.VICTORY_ZOOM_FACTOR * eased
                 zoom_time -= 1 / config.FPS
-            cam_t += 1 / config.FPS
 
         transformed = pygame_renderer.apply_camera(screen, (offset_x, offset_y), zoom)
         arr = pygame.surfarray.array3d(transformed)

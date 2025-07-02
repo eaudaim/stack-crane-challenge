@@ -10,7 +10,7 @@ FPS = 30
 INTRO_DURATION = 3  # seconds
 # Number of seconds before the challenge ends. If the tower has not
 # reached the required height after this duration, the run is a failure.
-TIME_LIMIT = 30
+TIME_LIMIT = 60
 # Total clip duration used when exporting the final video
 DURATION = INTRO_DURATION + TIME_LIMIT + 3
 

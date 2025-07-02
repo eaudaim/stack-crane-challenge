@@ -41,30 +41,30 @@ python -m src
 ```
 
 Par défaut un seul clip d’environ une minute est créé dans le dossier `output/`. Il est possible de spécifier combien de
-vidéos produire en appelant directement le script :
+vidéos produire en exécutant directement le module :
 
 ```bash
-python src/batch/batch_generate.py --count 5
+python -m src.batch.batch_generate --count 5
 ```
 
 Pour reproduire exactement la même séquence lors de plusieurs exécutions,
 vous pouvez fournir un `--seed` identique :
 
 ```bash
-python src/batch/batch_generate.py --seed 42
+python -m src.batch.batch_generate --seed 42
 ```
 
 Vous pouvez désactiver la bande son avec l'option `--no-audio` :
 
 ```bash
-python src/batch/batch_generate.py --no-audio
+python -m src.batch.batch_generate --no-audio
 ```
 
 Pour faciliter les tests d'animations déclenchées par la victoire, il est
 possible de forcer un empilement parfait en activant `--perfect-stack` :
 
 ```bash
-python src/batch/batch_generate.py --perfect-stack
+python -m src.batch.batch_generate --perfect-stack
 ```
 
 Les paramètres généraux (dimensions, durée, vitesses, palettes…) sont définis dans `src/config.py` et peuvent être ajustés

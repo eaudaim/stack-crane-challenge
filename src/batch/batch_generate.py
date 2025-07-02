@@ -380,8 +380,7 @@ def generate_once(
                 impact_fx[body] -= 1 / config.FPS
                 if impact_fx[body] <= 0:
                     impact_fx.pop(body)
-
-            vfx.update_confetti(confetti_particles, 1 / config.FPS)
+        vfx.update_confetti(confetti_particles, 1 / config.FPS)
         if glow_time > 0:
             glow_time -= 1 / config.FPS
         elif zoom_pending:

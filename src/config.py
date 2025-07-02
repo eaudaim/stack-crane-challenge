@@ -97,7 +97,7 @@ PREVIEW_HEIGHT = CRANE_DROP_HEIGHT
 PREVIEW_HIDE_DURATION = 1.0
 
 # Marge horizontale délimitant les mouvements de la grue
-CRANE_MOVEMENT_BOUNDS = 340
+CRANE_MOVEMENT_BOUNDS = 280
 
 # Paramètres de l'oscillation automatique de la grue
 CRANE_OSC_AMPLITUDE_RANGE = (
@@ -108,10 +108,10 @@ CRANE_OSC_FREQUENCY_RANGE = (0.4, 0.8)
 CRANE_OSC_PHASE_RANGE = (0.0, 2 * math.pi)
 # Facteur global appliqué à la fréquence pour accélérer ou ralentir
 # le mouvement de la grue sans modifier son amplitude.
-CRANE_OSC_SPEED_SCALE = 1.0
+CRANE_OSC_SPEED_SCALE = 1.9
 
 # Variation aléatoire appliquée à la position X du lâcher
-DROP_VARIATION_RANGE = (-10, 10)
+DROP_VARIATION_RANGE = (-12, 12)
 
 # Décalage du crochet par rapport au haut de la barre de grue. L'image de la
 # barre contient une grande marge transparente au-dessus de la partie visible.

@@ -1,50 +1,69 @@
-"""Global configuration constants for Stack Crane Challenge."""
+"""Constantes globales de configuration pour Stack Crane Challenge."""
 
 import os
 import math
 
+# ============================================================================
+# Paramètres de la fenêtre et de la simulation
+# ============================================================================
+
+# Dimensions de la fenêtre
 WIDTH = 1080
 HEIGHT = 1920
+
+# Images par seconde utilisées pour la physique et le rendu
 FPS = 30
-# Duration of the initial intro screen shown before the simulation starts
-INTRO_DURATION = 3  # seconds
-# Number of seconds before the challenge ends. If the tower has not
-# reached the required height after this duration, the run is a failure.
+
+# Durée de l'écran d'introduction avant le démarrage de la simulation (secondes)
+INTRO_DURATION = 3
+
+# Durée totale du défi. Si la tour n'atteint pas la hauteur requise avant la
+# fin du compte à rebours, la partie est perdue.
 TIME_LIMIT = 60
-# Total clip duration used when exporting the final video
+
+# Durée totale utilisée lors de l'export vidéo (intro + défi + marge finale)
 DURATION = INTRO_DURATION + TIME_LIMIT + 3
 
-# Pixel dimensions of a block sprite and its corresponding physics body
+# ============================================================================
+# Paramètres liés aux blocs
+# ============================================================================
+
+# Dimensions en pixels d'un bloc (sprite et corps physique)
 BLOCK_SIZE = (150, 220)
 
-# Time a resting block without another block placed on top
-# remains before disappearing through the floor (seconds)
+# Temps qu'un bloc au repos reste sur le sol avant de disparaître s'il n'est pas
+# supporté (secondes)
 BLOCK_DESPAWN_DELAY = 4.2
-# Toggle automatic removal of unsupported blocks. When set to ``False`` the
-# despawn logic is skipped and all blocks remain present.
+
+# Permettre la suppression automatique des blocs non supportés. Si ``False``,
+# la logique de disparition est ignorée et tous les blocs restent présents.
 BLOCK_DESPAWN_ENABLED = True
 
-# Angle (in radians) beyond which a resting block is considered to be
-# "on its side" and should be removed after ``BLOCK_DESPAWN_DELAY``
-# if unsupported.
+# Angle (en radians) au-delà duquel un bloc est considéré comme posé sur le
+# côté et doit disparaître après ``BLOCK_DESPAWN_DELAY`` s'il n'est pas
+# supporté.
 BLOCK_SIDE_ANGLE = 0.4
 
-# Vertical position of the floor segment used in the physics space
+# Position verticale du sol dans l'espace physique
 FLOOR_Y = 10
 
-# When enabled, the physics engine injects random forces each frame to
-# intentionally destabilise stacked blocks. A value of 0 disables the effect.
-BUG_SIDE_IMPULSE = 0.0  # horizontal impulse magnitude applied per frame
-# Random angular velocity added each frame to all dynamic bodies. Set to 0 to disable.
+# Injection volontaire de forces parasites pour déstabiliser la pile.
+# Une valeur de 0 désactive l'effet.
+BUG_SIDE_IMPULSE = 0.0  # impulsion horizontale appliquée à chaque frame
+
+# Vitesse angulaire aléatoire ajoutée chaque frame. Mettre à 0 pour désactiver.
 BUG_SPIN_VELOCITY = 0.0
 
-# Additional upward/downward attractive force between vertically adjacent blocks.
-# A value of 0 disables the effect. This helps stacked blocks stick together
-# slightly to reduce unwanted sliding.
+# Force d'adhésion verticale entre blocs adjacents. A 0 l'effet est inactif et
+# sert à réduire les glissements indésirables.
 BLOCK_ADHESION_FORCE = 3
 
 
-# Different textures that can be used for the falling blocks
+# ============================================================================
+# Paramètres de génération et de déplacement des blocs
+# ============================================================================
+
+# Textures possibles pour les blocs qui tombent
 BLOCK_VARIANTS = [
     "block.png",
     "block_variant1.png",
@@ -52,32 +71,32 @@ BLOCK_VARIANTS = [
     "block_variant3.png",
 ]
 
-# Number of blocks that may be dropped in a single video
+# Nombre de blocs pouvant être lâchés durant une vidéo
 BLOCK_COUNT_RANGE = (10, 20)
 
-# Speed of the moving crane in pixels per second
+# Vitesse de déplacement de la grue en pixels/seconde
 GRUE_SPEED_RANGE = (80, 120)
 
-# Fraction of the crane's horizontal velocity transferred to a block when it
-# is dropped. A value of 1.0 means the block starts with the same horizontal
-# speed as the hook, while 0 would spawn it without sideways momentum.
+# Fraction de la vitesse horizontale de la grue transmise au bloc lors du
+# lâcher. 1.0 signifie que le bloc démarre avec la même vitesse horizontale que
+# le crochet, alors que 0 le fait apparaître sans élan latéral.
 DROP_HORIZONTAL_SPEED_FACTOR = 1.0
 
-# Height from the bottom of the screen where blocks are spawned
+# Hauteur de génération des blocs depuis le bas de l'écran
 CRANE_DROP_HEIGHT = 635
-# Height from the bottom of the screen where the preview of the next block
-# should be displayed.  By default it matches ``CRANE_DROP_HEIGHT`` so the
-# preview appears exactly where blocks will spawn.
+# Hauteur depuis le bas où l'aperçu du prochain bloc est affiché. Par défaut
+# elle correspond à ``CRANE_DROP_HEIGHT`` pour montrer l'emplacement exact de
+# la génération.
 PREVIEW_HEIGHT = CRANE_DROP_HEIGHT
 
-# Duration in seconds during which the preview is hidden after a block is
-# spawned.  This avoids permanently showing a block on screen.
+# Durée pendant laquelle l'aperçu est caché après la création d'un bloc. Cela
+# évite d'avoir un bloc affiché en permanence à l'écran.
 PREVIEW_HIDE_DURATION = 1.0
 
-# Horizontal margin used for crane movement limits
+# Marge horizontale délimitant les mouvements de la grue
 CRANE_MOVEMENT_BOUNDS = 340
 
-# Oscillating crane movement parameters
+# Paramètres de l'oscillation automatique de la grue
 CRANE_OSC_AMPLITUDE_RANGE = (
     80,
     WIDTH // 2 - CRANE_MOVEMENT_BOUNDS,
@@ -85,69 +104,71 @@ CRANE_OSC_AMPLITUDE_RANGE = (
 CRANE_OSC_FREQUENCY_RANGE = (0.4, 0.8)
 CRANE_OSC_PHASE_RANGE = (0.0, 2 * math.pi)
 
-# Random variation applied to the drop X position
+# Variation aléatoire appliquée à la position X du lâcher
 DROP_VARIATION_RANGE = (-10, 10)
 
-# Offset for the hook relative to the top of the crane bar
-# The crane_bar asset contains a large transparent margin above the
-# visible bar. To keep the hook 80px below the visible bar despite
-# this margin, we compensate here (394px transparent head).
+# Décalage du crochet par rapport au haut de la barre de grue. L'image de la
+# barre contient une grande marge transparente au-dessus de la partie visible.
+# Pour garder le crochet 80 px sous la barre malgré cette marge (394 px de
+# tête transparente), on compense ici.
 HOOK_Y_OFFSET = 400
 
-# Vertical position of the crane bar itself. We shift it upward so the
-# visible bar sits only a few pixels from the top of the window.
+# Position verticale de la barre de grue. On la décale vers le haut pour que la
+# partie visible soit à quelques pixels du bord supérieur de la fenêtre.
 CRANE_BAR_Y = -389
 
-# Delay between consecutive block drops in seconds
-# ``BLOCK_DROP_JITTER`` adds a small random variation to each delay.  This
-# prevents the drops from feeling too mechanical without ever producing huge
-# gaps or multiple blocks at the same time.
+# Délai entre deux lâchers successifs (secondes). ``BLOCK_DROP_JITTER`` ajoute
+# une petite variation aléatoire pour éviter un rythme trop mécanique sans
+# provoquer de gros écarts ni de lâchers multiples.
 BLOCK_DROP_INTERVAL = 2
-# Maximum random variation applied to the drop interval.  The actual delay will
-# be ``BLOCK_DROP_INTERVAL`` plus or minus a value drawn from this range.
+# Variation maximale appliquée à l'intervalle. Le délai réel sera donc
+# ``BLOCK_DROP_INTERVAL`` plus ou moins une valeur prise dans cette plage.
 BLOCK_DROP_JITTER = 0.4
 
-# Available color palettes for overlays or effects
-# "timer" is identical to the countdown timer colors. Additional palettes can be
-# used for styling the intro text with various looks.
+# ============================================================================
+# Palettes de couleurs et styles d'introduction
+# ============================================================================
+#
+# "timer" reprend les couleurs du compte à rebours. Les autres palettes
+# permettent de styliser le texte d'intro avec différents rendus.
 PALETTES = {
     "default": {
         "text": (255, 255, 255),
         "shadow": (0, 0, 0),
     },
-    # Same white text with black shadow as the timer
+    # Même texte blanc et ombre noire que pour le timer
     "timer": {
         "text": (255, 255, 255),
         "shadow": (0, 0, 0),
     },
-    # Green on black retro computer style
+    # Style rétro : vert sur fond noir
     "retro": {
         "text": (0, 255, 0),
         "shadow": (0, 0, 0),
     },
-    # Magenta text with cyan shadow for a neon effect
+    # Effet néon : texte magenta avec ombre cyan
     "neon": {
         "text": (255, 0, 255),
         "shadow": (0, 255, 255),
     },
-    # Yellow text with dark blue shadow reminiscent of comic books
+    # Style BD : jaune avec ombre bleu foncé
     "comic": {
         "text": (255, 255, 0),
         "shadow": (0, 0, 128),
     },
 }
 
-# Predefined intro styles combining fonts, colors and shadow offsets
+# Styles d'intro préconfigurés combinant polices, couleurs et décalages d'ombre
 INTRO_STYLES = {
-    # Matches the countdown timer appearance
+    # Identique au compte à rebours
     "timer": {
-        "font_name": None,  # default font
+        "font_name": None,  # police par défaut
         "font_size": 120,
         "y_pos": HEIGHT // 4,
         "shadow_offset": (2, 2),
         "palette": "timer",
     },
-    # A green retro terminal look
+    # Look terminal rétro vert
     "retro": {
         "font_name": "courier",
         "font_size": 100,
@@ -155,7 +176,7 @@ INTRO_STYLES = {
         "shadow_offset": (4, 4),
         "palette": "retro",
     },
-    # Bright neon colors with a larger shadow
+    # Couleurs néon avec ombre marquée
     "neon": {
         "font_name": "arial",
         "font_size": 110,
@@ -163,7 +184,7 @@ INTRO_STYLES = {
         "shadow_offset": (6, 6),
         "palette": "neon",
     },
-    # Comic style using Comic Sans and contrasting shadow
+    # Style bande dessinée avec Comic Sans et ombre contrastée
     "comic": {
         "font_name": "comicsansms",
         "font_size": 120,
@@ -173,18 +194,18 @@ INTRO_STYLES = {
     },
 }
 
-# Text shown at the beginning of the video and its styling options
+# Texte affiché au début de la vidéo et ses options de style
 INTRO_TEXT = "TERMINE CETTE TOUR EN 60s"
 INTRO_STYLE = {
     "font_size": 100,
-    # Vertical position of the text. A value closer to 0 means higher on screen
+    # Position verticale du texte (plus la valeur est petite, plus le texte est haut)
     "y_pos": HEIGHT // 4,
     "shadow_offset": (4, 4),
-    # Palette key used for text and shadow colors
+    # Clé de palette utilisée pour les couleurs du texte et de l'ombre
     "palette": "neon",
 }
 
-# Sky backgrounds available in assets/sky
+# Arrières-plans du ciel disponibles dans ``assets/sky``
 SKY_OPTIONS = [
     "skyline_day.png",
     "skyline_night.png",
@@ -200,15 +221,18 @@ ASSET_PATHS = {
 
 OUTPUT_DIR = "output"
 
-# --- VFX configuration ---
-# Duration of a color flash after an impact (seconds)
+# ============================================================================
+# Configuration des effets visuels (VFX)
+# ============================================================================
+
+# Durée du flash coloré après un impact (secondes)
 IMPACT_FLASH_DURATION = 0.2
-# Maximum opacity used for the flash overlay
+# Opacité maximale du flash
 IMPACT_FLASH_ALPHA = 200
-# Tint color applied during an impact flash
+# Couleur appliquée lors du flash d'impact
 IMPACT_FLASH_COLOR = (255, 160, 40)
 
-# Confetti parameters displayed on victory
+# Paramètres des confettis affichés lors d'une victoire
 CONFETTI_COUNT = 40
 CONFETTI_COLORS = [
     (255, 0, 0),
@@ -220,7 +244,7 @@ CONFETTI_COLORS = [
 CONFETTI_LIFETIME = 1.0
 CONFETTI_GRAVITY = 400
 
-# Glow overlay shown when the tower is completed
+# Halo lumineux affiché quand la tour est terminée
 GLOW_DURATION = 1.0
 GLOW_COLOR = (255, 255, 0)
 GLOW_ALPHA = 80

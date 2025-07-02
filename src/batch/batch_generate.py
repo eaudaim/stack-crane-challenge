@@ -85,6 +85,8 @@ def generate_once(index: int, assets, sounds=None) -> None:
 
     variant_history: deque = deque(maxlen=2)
     preview_variant = choose_block_variant(config.BLOCK_VARIANTS, variant_history)
+    # Time until which the preview should remain hidden after a drop
+    preview_hidden_until = 0.0
     unsupported: dict[pymunk.Body, float] = {}
     falling_blocks: set[pymunk.Body] = set()
     first_block: pymunk.Body | None = None
@@ -123,6 +125,7 @@ def generate_once(index: int, assets, sounds=None) -> None:
             )
             delay = max(0.5, delay)
             next_drop_time = t + delay
+            preview_hidden_until = t + config.PREVIEW_HIDE_DURATION
             preview_variant = choose_block_variant(
                 config.BLOCK_VARIANTS,
                 variant_history,
@@ -211,7 +214,8 @@ def generate_once(index: int, assets, sounds=None) -> None:
         elif crane_x < config.CRANE_MOVEMENT_BOUNDS:
             crane_x = config.CRANE_MOVEMENT_BOUNDS
             crane_dir = 1
-        pygame_renderer.render_frame(screen, space, assets, crane_x, sky, preview_variant)
+        show_preview = preview_variant if t >= preview_hidden_until else None
+        pygame_renderer.render_frame(screen, space, assets, crane_x, sky, show_preview)
         overlays.draw_timer(screen, remaining)
         arr = pygame.surfarray.array3d(screen)
         arr = np.transpose(arr, (1, 0, 2))

@@ -56,6 +56,14 @@ GRUE_SPEED_RANGE = (80, 120)
 
 # Height from the bottom of the screen where blocks are spawned
 CRANE_DROP_HEIGHT = 580
+# Height from the bottom of the screen where the preview of the next block
+# should be displayed.  By default it matches ``CRANE_DROP_HEIGHT`` so the
+# preview appears exactly where blocks will spawn.
+PREVIEW_HEIGHT = CRANE_DROP_HEIGHT
+
+# Duration in seconds during which the preview is hidden after a block is
+# spawned.  This avoids permanently showing a block on screen.
+PREVIEW_HIDE_DURATION = 1.0
 
 # Horizontal margin used for crane movement limits
 CRANE_MOVEMENT_BOUNDS = 340

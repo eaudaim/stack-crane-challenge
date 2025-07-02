@@ -36,6 +36,8 @@ def run(output: str = os.path.join(config.OUTPUT_DIR, "stack_test.mp4"), seconds
     block_height = config.BLOCK_SIZE[1]
     for step in range(10):
         space.step(1 / config.FPS)
+        space_builder.apply_bug_forces(space)
+        space_builder.apply_adhesion_forces(space)
         print(f"Step {step}: Block1={block1.position}, Block2={block2.position}")
         b1_top = block1.position.y + block_height / 2
         b2_bottom = block2.position.y - block_height / 2
@@ -53,6 +55,8 @@ def run(output: str = os.path.join(config.OUTPUT_DIR, "stack_test.mp4"), seconds
             print(f"Nombre de bodies: {len(space.bodies)}")
             print(f"Nombre de shapes: {len(space.shapes)}")
         space.step(1 / config.FPS)
+        space_builder.apply_bug_forces(space)
+        space_builder.apply_adhesion_forces(space)
         arr = pygame_renderer.render_frame(screen, space, assets, crane_x, "skyline_day.png")
         frames.append(arr)
 

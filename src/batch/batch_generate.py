@@ -95,7 +95,10 @@ def generate_once(
         phase = 0.0
     else:
         amplitude = rng.uniform(*config.CRANE_OSC_AMPLITUDE_RANGE)
-        frequency = rng.uniform(*config.CRANE_OSC_FREQUENCY_RANGE)
+        frequency = (
+            rng.uniform(*config.CRANE_OSC_FREQUENCY_RANGE)
+            * config.CRANE_OSC_SPEED_SCALE
+        )
         phase = rng.uniform(*config.CRANE_OSC_PHASE_RANGE)
     spawn_y = config.HEIGHT - config.CRANE_DROP_HEIGHT
     state = None  # "victory" or "fail"

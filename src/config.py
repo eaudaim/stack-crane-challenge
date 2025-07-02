@@ -79,11 +79,6 @@ BLOCK_VARIANTS = [
     "block_variant3.png",
 ]
 
-# Nombre de blocs pouvant être lâchés durant une vidéo
-BLOCK_COUNT_RANGE = (10, 20)
-
-# Vitesse de déplacement de la grue en pixels/seconde
-GRUE_SPEED_RANGE = (80, 120)
 
 # Fraction de la vitesse horizontale de la grue transmise au bloc lors du
 # lâcher. 1.0 signifie que le bloc démarre avec la même vitesse horizontale que
@@ -111,6 +106,9 @@ CRANE_OSC_AMPLITUDE_RANGE = (
 )
 CRANE_OSC_FREQUENCY_RANGE = (0.4, 0.8)
 CRANE_OSC_PHASE_RANGE = (0.0, 2 * math.pi)
+# Facteur global appliqué à la fréquence pour accélérer ou ralentir
+# le mouvement de la grue sans modifier son amplitude.
+CRANE_OSC_SPEED_SCALE = 1.0
 
 # Variation aléatoire appliquée à la position X du lâcher
 DROP_VARIATION_RANGE = (-10, 10)

@@ -72,8 +72,9 @@ selon vos besoins.
 Un paramètre `BLOCK_DROP_JITTER` permet également d'introduire une légère
 variabilité dans l'intervalle entre deux chutes de bloc pour rendre l'action
 moins prévisible.
-De nouveaux paramètres `CRANE_OSC_*` contrôlent l'amplitude et la vitesse du
-mouvement sinusoïdal de la grue.
+Les constantes `CRANE_OSC_*` définissent l'amplitude et la fréquence du
+mouvement sinusoïdal de la grue, tandis que `CRANE_OSC_SPEED_SCALE` permet
+d'en ajuster facilement la vitesse moyenne.
 
 ### Test d'empilage simple
 

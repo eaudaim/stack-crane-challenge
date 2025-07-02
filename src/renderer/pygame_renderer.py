@@ -1,6 +1,6 @@
 """Headless Pygame renderer for the challenge."""
 
-from typing import Dict
+from typing import Dict, Optional
 import math
 import os
 
@@ -56,6 +56,9 @@ def render_frame(
     crane_x: float,
     sky_name: str,
     preview_variant: str | None = None,
+    block_effects: Optional[dict] | None = None,
+    confetti: Optional[list] | None = None,
+    glow_alpha: int = 0,
 ) -> np.ndarray:
     """Render a single frame and return it as a numpy array.
 
@@ -64,6 +67,8 @@ def render_frame(
     sprite is drawn beneath the hook so the upcoming block is visible to the
     viewer.
     """
+    block_effects = block_effects or {}
+    confetti = confetti or []
     surface.blit(assets["sky"][sky_name], (0, 0))
     bar_img = assets["crane_bar"]
     if bar_img.get_width() != config.WIDTH:
@@ -89,11 +94,24 @@ def render_frame(
         if variant and variant in assets["blocks"]:
             base_img = assets["blocks"][variant]
             img = rotate_surface(base_img, body.angle)
+            effect = block_effects.get(body)
+            if effect:
+                color, alpha = effect
+                overlay = pygame.Surface(img.get_size(), pygame.SRCALPHA)
+                overlay.fill((*color, alpha))
+                img.blit(overlay, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
             x, y = body.position
-            # Convert from Pymunk's bottom-left origin to Pygame's top-left
-            # coordinate system.
             py_y = config.HEIGHT - int(y)
             rect = img.get_rect(center=(int(x), py_y))
             surface.blit(img, rect)
+
+    if confetti:
+        from . import vfx
+        vfx.draw_confetti(surface, confetti)
+
+    if glow_alpha > 0:
+        overlay = pygame.Surface((config.WIDTH, config.HEIGHT), pygame.SRCALPHA)
+        overlay.fill((*config.GLOW_COLOR, glow_alpha))
+        surface.blit(overlay, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
     arr = pygame.surfarray.array3d(surface)
     return np.transpose(arr, (1, 0, 2))

@@ -188,7 +188,10 @@ def generate_once(index: int, assets, sounds=None) -> None:
                 continue
 
             unsupported[b] = unsupported.get(b, 0.0) + 1 / config.FPS
-            if unsupported[b] >= config.BLOCK_DESPAWN_DELAY:
+            if (
+                config.BLOCK_DESPAWN_ENABLED
+                and unsupported[b] >= config.BLOCK_DESPAWN_DELAY
+            ):
                 for s in b.shapes:
                     s.sensor = True
                 b.velocity = (0, -300)

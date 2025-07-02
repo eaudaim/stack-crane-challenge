@@ -12,5 +12,6 @@ def test_basic_constants():
     assert config.BLOCK_DROP_INTERVAL > 0
     assert 0 <= config.BLOCK_DROP_JITTER < config.BLOCK_DROP_INTERVAL
     assert config.BLOCK_DESPAWN_DELAY > 0
+    assert isinstance(config.BLOCK_DESPAWN_ENABLED, bool)
     assert config.BLOCK_SIDE_ANGLE > 0
     assert config.BLOCK_ADHESION_FORCE >= 0

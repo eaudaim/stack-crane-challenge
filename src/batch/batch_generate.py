@@ -76,15 +76,23 @@ def generate_once(
     sounds=None,
     seed: Optional[int] = None,
     perfect_stack: bool | None = None,
+    sky: str | None = None,
 ) -> None:
-    """Generate a single video with random parameters."""
+    """Generate a single video with optional overrides for randomness.
+
+    ``sky`` can be one of the names defined in ``config.SKY_OPTIONS`` to force
+    a specific background.
+    """
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
     space = space_builder.init_space()
     screen = pygame.Surface((config.WIDTH, config.HEIGHT))
     frames = []
     events = []
     rng = random.Random(seed)
-    sky = rng.choice(config.SKY_OPTIONS)
+    if sky is None:
+        sky = rng.choice(config.SKY_OPTIONS)
+    elif sky not in config.SKY_OPTIONS:
+        raise ValueError(f"Unknown sky '{sky}'. Valid options are: {config.SKY_OPTIONS}")
     crane_x = config.WIDTH // 2
     if perfect_stack is None:
         perfect_stack = config.PERFECT_STACK
@@ -454,11 +462,22 @@ def run_single(
     with_audio: bool = True,
     seed: Optional[int] = None,
     perfect_stack: bool | None = None,
+    sky: str | None = None,
 ) -> None:
-    """Load resources and generate a single clip."""
+    """Load resources and generate a single clip.
+
+    The ``sky`` argument lets you specify one of the available backgrounds.
+    """
     assets = pygame_renderer.load_assets()
     sounds = sound_manager.load_sounds() if with_audio else None
-    generate_once(index, assets, sounds, seed=seed, perfect_stack=perfect_stack)
+    generate_once(
+        index,
+        assets,
+        sounds,
+        seed=seed,
+        perfect_stack=perfect_stack,
+        sky=sky,
+    )
 
 
 def main(
@@ -466,6 +485,7 @@ def main(
     with_audio: bool = True,
     seed: Optional[int] = None,
     perfect_stack: bool | None = None,
+    sky: str | None = None,
 ) -> None:
     """Generate ``count`` videos, isolating each run in a subprocess."""
     import subprocess
@@ -480,6 +500,8 @@ def main(
             cmd.extend(["--seed", str(run_seed)])
         if perfect_stack:
             cmd.append("--perfect-stack")
+        if sky is not None:
+            cmd.extend(["--sky", sky])
         subprocess.run(cmd, check=True)
 
 
@@ -502,6 +524,13 @@ if __name__ == "__main__":
         action="store_true",
         help="Empile automatiquement les blocs sans mouvement de grue",
     )
+    parser.add_argument(
+        "--sky",
+        type=str,
+        choices=config.SKY_OPTIONS,
+        default=None,
+        help="Choisir un fond de ciel spécifique",
+    )
     args = parser.parse_args()
     if args._single:
         run_single(
@@ -509,6 +538,7 @@ if __name__ == "__main__":
             not args.no_audio,
             seed=args.seed,
             perfect_stack=args.perfect_stack,
+            sky=args.sky,
         )
     else:
         main(
@@ -516,4 +546,5 @@ if __name__ == "__main__":
             not args.no_audio,
             seed=args.seed,
             perfect_stack=args.perfect_stack,
+            sky=args.sky,
         )

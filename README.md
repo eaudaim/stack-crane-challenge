@@ -67,6 +67,11 @@ possible de forcer un empilement parfait en activant `--perfect-stack` :
 python -m src.batch.batch_generate --perfect-stack
 ```
 
+Vous pouvez également sélectionner un fond précis grâce à l'option `--sky` :
+```bash
+python -m src.batch.batch_generate --sky skyline_day.png
+```
+
 Les paramètres généraux (dimensions, durée, vitesses, palettes…) sont définis dans `src/config.py` et peuvent être ajustés
 selon vos besoins.
 Un paramètre `BLOCK_DROP_JITTER` permet également d'introduire une légère

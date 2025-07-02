@@ -19,6 +19,9 @@ BLOCK_SIZE = (150, 220)
 # Time a resting block without another block placed on top
 # remains before disappearing through the floor (seconds)
 BLOCK_DESPAWN_DELAY = 3
+# Toggle automatic removal of unsupported blocks. When set to ``False`` the
+# despawn logic is skipped and all blocks remain present.
+BLOCK_DESPAWN_ENABLED = True
 
 # Angle (in radians) beyond which a resting block is considered to be
 # "on its side" and should be removed after ``BLOCK_DESPAWN_DELAY``

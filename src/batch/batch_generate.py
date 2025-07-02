@@ -171,7 +171,8 @@ def generate_once(
     # Render a short intro sequence before starting the simulation
     for _ in range(config.INTRO_DURATION * config.FPS):
         pygame_renderer.render_frame(screen, space, assets, crane_x, sky, preview_variant)
-        overlays.draw_intro(screen)
+        style_name = config.INTRO_STYLE_BY_SKY.get(sky, config.DEFAULT_INTRO_STYLE_NAME)
+        overlays.draw_intro(screen, style_name=style_name)
         arr = pygame.surfarray.array3d(screen)
         arr = np.transpose(arr, (1, 0, 2))
         frames.append(arr)

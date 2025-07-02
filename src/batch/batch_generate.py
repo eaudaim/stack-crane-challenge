@@ -5,6 +5,7 @@ import os
 import random
 import math
 from collections import deque
+from typing import Optional
 
 
 def choose_block_variant(variants, history: deque) -> str:
@@ -35,17 +36,20 @@ from ..audio import sound_manager
 from ..video_export import moviepy_exporter
 
 
-def generate_once(index: int, assets, sounds=None) -> None:
+def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -> None:
     """Generate a single video with random parameters."""
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
     space = space_builder.init_space()
     screen = pygame.Surface((config.WIDTH, config.HEIGHT))
     frames = []
     events = []
-    sky = random.choice(config.SKY_OPTIONS)
+    rng = random.Random(seed)
+    sky = rng.choice(config.SKY_OPTIONS)
     crane_x = config.WIDTH // 2
-    crane_speed = random.randint(*config.GRUE_SPEED_RANGE)
-    crane_dir = 1
+    # Oscillation parameters for the crane movement
+    amplitude = rng.uniform(*config.CRANE_OSC_AMPLITUDE_RANGE)
+    frequency = rng.uniform(*config.CRANE_OSC_FREQUENCY_RANGE)
+    phase = rng.uniform(*config.CRANE_OSC_PHASE_RANGE)
     spawn_y = config.HEIGHT - config.CRANE_DROP_HEIGHT
     state = None  # "victory" or "fail"
     # Track the current simulation time so collision callbacks can timestamp
@@ -111,7 +115,8 @@ def generate_once(index: int, assets, sounds=None) -> None:
             prev_second = secs
         if state is None and t >= next_drop_time:
             drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
-            initial_vx = crane_dir * crane_speed * config.DROP_HORIZONTAL_SPEED_FACTOR
+            crane_vx = amplitude * frequency * math.cos(frequency * t + phase)
+            initial_vx = crane_vx * config.DROP_HORIZONTAL_SPEED_FACTOR
             new_block = block.create_block(
                 space,
                 drop_x,
@@ -212,13 +217,14 @@ def generate_once(index: int, assets, sounds=None) -> None:
                     remaining_challenge = sim_time["t"] - config.INTRO_DURATION
                     final_remaining = max(0.0, config.TIME_LIMIT - remaining_challenge)
                     break
-        crane_x += crane_dir * crane_speed / config.FPS
-        if crane_x > config.WIDTH - config.CRANE_MOVEMENT_BOUNDS:
-            crane_x = config.WIDTH - config.CRANE_MOVEMENT_BOUNDS
-            crane_dir = -1
-        elif crane_x < config.CRANE_MOVEMENT_BOUNDS:
-            crane_x = config.CRANE_MOVEMENT_BOUNDS
-            crane_dir = 1
+        crane_x = (
+            config.WIDTH // 2
+            + amplitude * math.sin(frequency * t + phase)
+        )
+        crane_x = max(
+            config.CRANE_MOVEMENT_BOUNDS,
+            min(config.WIDTH - config.CRANE_MOVEMENT_BOUNDS, crane_x),
+        )
         show_preview = preview_variant if t >= preview_hidden_until else None
         pygame_renderer.render_frame(screen, space, assets, crane_x, sky, show_preview)
         overlays.draw_timer(screen, remaining)
@@ -255,11 +261,12 @@ def generate_once(index: int, assets, sounds=None) -> None:
     moviepy_exporter.export_video(frames, audio, output)
 
 
-def main(count: int, with_audio: bool = True) -> None:
+def main(count: int, with_audio: bool = True, seed: Optional[int] = None) -> None:
     assets = pygame_renderer.load_assets()
     sounds = sound_manager.load_sounds() if with_audio else None
     for i in range(count):
-        generate_once(i, assets, sounds)
+        run_seed = None if seed is None else seed + i
+        generate_once(i, assets, sounds, seed=run_seed)
 
 
 if __name__ == "__main__":
@@ -268,5 +275,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--no-audio", action="store_true", help="Disable sound track generation"
     )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Base random seed for reproducible runs",
+    )
     args = parser.parse_args()
-    main(args.count, not args.no_audio)
+    main(args.count, not args.no_audio, seed=args.seed)

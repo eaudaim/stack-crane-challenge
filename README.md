@@ -47,6 +47,13 @@ vidéos produire en appelant directement le script :
 python src/batch/batch_generate.py --count 5
 ```
 
+Pour reproduire exactement la même séquence lors de plusieurs exécutions,
+vous pouvez fournir un `--seed` identique :
+
+```bash
+python src/batch/batch_generate.py --seed 42
+```
+
 Vous pouvez désactiver la bande son avec l'option `--no-audio` :
 
 ```bash
@@ -58,6 +65,8 @@ selon vos besoins.
 Un paramètre `BLOCK_DROP_JITTER` permet également d'introduire une légère
 variabilité dans l'intervalle entre deux chutes de bloc pour rendre l'action
 moins prévisible.
+De nouveaux paramètres `CRANE_OSC_*` contrôlent l'amplitude et la vitesse du
+mouvement sinusoïdal de la grue.
 
 ### Test d'empilage simple
 

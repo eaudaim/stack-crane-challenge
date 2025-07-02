@@ -54,6 +54,11 @@ BLOCK_COUNT_RANGE = (10, 20)
 # Speed of the moving crane in pixels per second
 GRUE_SPEED_RANGE = (80, 120)
 
+# Fraction of the crane's horizontal velocity transferred to a block when it
+# is dropped. A value of 1.0 means the block starts with the same horizontal
+# speed as the hook, while 0 would spawn it without sideways momentum.
+DROP_HORIZONTAL_SPEED_FACTOR = 1.0
+
 # Height from the bottom of the screen where blocks are spawned
 CRANE_DROP_HEIGHT = 580
 # Height from the bottom of the screen where the preview of the next block

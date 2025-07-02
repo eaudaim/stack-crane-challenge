@@ -111,11 +111,13 @@ def generate_once(index: int, assets, sounds=None) -> None:
             prev_second = secs
         if state is None and t >= next_drop_time:
             drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
+            initial_vx = crane_dir * crane_speed * config.DROP_HORIZONTAL_SPEED_FACTOR
             new_block = block.create_block(
                 space,
                 drop_x,
                 config.HEIGHT - config.CRANE_DROP_HEIGHT,
                 preview_variant,
+                initial_velocity=(initial_vx, 0.0),
             )
             if first_block is None:
                 first_block = new_block

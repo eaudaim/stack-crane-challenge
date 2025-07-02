@@ -15,3 +15,4 @@ def test_basic_constants():
     assert isinstance(config.BLOCK_DESPAWN_ENABLED, bool)
     assert config.BLOCK_SIDE_ANGLE > 0
     assert config.BLOCK_ADHESION_FORCE >= 0
+    assert isinstance(config.CAMERA_EFFECTS_ENABLED, bool)

@@ -119,6 +119,9 @@ def render_frame(
 
 def apply_camera(surface: pygame.Surface, offset=(0.0, 0.0), zoom: float = 1.0) -> pygame.Surface:
     """Return a new surface with the camera transform applied."""
+    if not config.CAMERA_EFFECTS_ENABLED or (offset == (0.0, 0.0) and zoom == 1.0):
+        return surface.copy()
+
     if zoom != 1.0:
         w = int(config.WIDTH * zoom)
         h = int(config.HEIGHT * zoom)

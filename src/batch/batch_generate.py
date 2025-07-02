@@ -279,21 +279,23 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
         )
         overlays.draw_timer(screen, remaining)
 
-        base = cam_amp * math.sin(cam_freq * cam_t + cam_phase)
-        offset_x = base if cam_axis == "x" else 0.0
-        offset_y = base if cam_axis == "y" else 0.0
-        if shake_time > 0:
-            strength = shake_time / config.CAMERA_SHAKE_DURATION
-            offset_x += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
-            offset_y += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
-            shake_time -= 1 / config.FPS
+        offset_x = offset_y = 0.0
         zoom = 1.0
-        if zoom_time > 0:
-            progress = 1 - zoom_time / config.VICTORY_ZOOM_DURATION
-            eased = progress * progress * (3 - 2 * progress)
-            zoom = 1 + config.VICTORY_ZOOM_FACTOR * eased
-            zoom_time -= 1 / config.FPS
-        cam_t += 1 / config.FPS
+        if config.CAMERA_EFFECTS_ENABLED:
+            base = cam_amp * math.sin(cam_freq * cam_t + cam_phase)
+            offset_x = base if cam_axis == "x" else 0.0
+            offset_y = base if cam_axis == "y" else 0.0
+            if shake_time > 0:
+                strength = shake_time / config.CAMERA_SHAKE_DURATION
+                offset_x += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+                offset_y += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+                shake_time -= 1 / config.FPS
+            if zoom_time > 0:
+                progress = 1 - zoom_time / config.VICTORY_ZOOM_DURATION
+                eased = progress * progress * (3 - 2 * progress)
+                zoom = 1 + config.VICTORY_ZOOM_FACTOR * eased
+                zoom_time -= 1 / config.FPS
+            cam_t += 1 / config.FPS
 
         transformed = pygame_renderer.apply_camera(screen, (offset_x, offset_y), zoom)
         arr = pygame.surfarray.array3d(transformed)
@@ -339,21 +341,23 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
             overlays.draw_victory(screen)
         else:
             overlays.draw_fail(screen)
-        base = cam_amp * math.sin(cam_freq * cam_t + cam_phase)
-        offset_x = base if cam_axis == "x" else 0.0
-        offset_y = base if cam_axis == "y" else 0.0
-        if shake_time > 0:
-            strength = shake_time / config.CAMERA_SHAKE_DURATION
-            offset_x += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
-            offset_y += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
-            shake_time -= 1 / config.FPS
+        offset_x = offset_y = 0.0
         zoom = 1.0
-        if zoom_time > 0:
-            progress = 1 - zoom_time / config.VICTORY_ZOOM_DURATION
-            eased = progress * progress * (3 - 2 * progress)
-            zoom = 1 + config.VICTORY_ZOOM_FACTOR * eased
-            zoom_time -= 1 / config.FPS
-        cam_t += 1 / config.FPS
+        if config.CAMERA_EFFECTS_ENABLED:
+            base = cam_amp * math.sin(cam_freq * cam_t + cam_phase)
+            offset_x = base if cam_axis == "x" else 0.0
+            offset_y = base if cam_axis == "y" else 0.0
+            if shake_time > 0:
+                strength = shake_time / config.CAMERA_SHAKE_DURATION
+                offset_x += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+                offset_y += rng.uniform(-1, 1) * config.CAMERA_SHAKE_INTENSITY * strength
+                shake_time -= 1 / config.FPS
+            if zoom_time > 0:
+                progress = 1 - zoom_time / config.VICTORY_ZOOM_DURATION
+                eased = progress * progress * (3 - 2 * progress)
+                zoom = 1 + config.VICTORY_ZOOM_FACTOR * eased
+                zoom_time -= 1 / config.FPS
+            cam_t += 1 / config.FPS
 
         transformed = pygame_renderer.apply_camera(screen, (offset_x, offset_y), zoom)
         arr = pygame.surfarray.array3d(transformed)

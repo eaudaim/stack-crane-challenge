@@ -253,6 +253,9 @@ GLOW_ALPHA = 80
 # Paramètres de mouvement de la caméra
 # ============================================================================
 
+# Activer ou non les effets de caméra (shake, zoom, oscillation)
+CAMERA_EFFECTS_ENABLED = True
+
 # Durée (en secondes) du shake appliqué lors d'un impact
 CAMERA_SHAKE_DURATION = 0.3
 # Amplitude maximale du shake en pixels

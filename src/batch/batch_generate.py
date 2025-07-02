@@ -131,6 +131,8 @@ def generate_once(index: int, assets, sounds=None) -> None:
         # with the rendered frames.
         sim_time["t"] = config.INTRO_DURATION + (i + 1) / config.FPS
         space.step(1 / config.FPS)
+        space_builder.apply_bug_forces(space)
+        space_builder.apply_adhesion_forces(space)
 
         dynamic_bodies = [
             b
@@ -220,6 +222,8 @@ def generate_once(index: int, assets, sounds=None) -> None:
     for _ in range(config.FPS * 2):
         sim_time["t"] += 1 / config.FPS
         space.step(1 / config.FPS)
+        space_builder.apply_bug_forces(space)
+        space_builder.apply_adhesion_forces(space)
         arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky)
         show_remaining = 0 if final_remaining is None else final_remaining
         overlays.draw_timer(screen, show_remaining)

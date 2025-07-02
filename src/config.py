@@ -28,6 +28,17 @@ BLOCK_SIDE_ANGLE = 0.4
 # Vertical position of the floor segment used in the physics space
 FLOOR_Y = 10
 
+# When enabled, the physics engine injects random forces each frame to
+# intentionally destabilise stacked blocks. A value of 0 disables the effect.
+BUG_SIDE_IMPULSE = 0.0  # horizontal impulse magnitude applied per frame
+# Random angular velocity added each frame to all dynamic bodies. Set to 0 to disable.
+BUG_SPIN_VELOCITY = 0.0
+
+# Additional upward/downward attractive force between vertically adjacent blocks.
+# A value of 0 disables the effect. This helps stacked blocks stick together
+# slightly to reduce unwanted sliding.
+BLOCK_ADHESION_FORCE = 0.0
+
 
 # Different textures that can be used for the falling blocks
 BLOCK_VARIANTS = [

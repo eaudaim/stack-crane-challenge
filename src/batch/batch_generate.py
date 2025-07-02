@@ -31,7 +31,7 @@ from pydub import AudioSegment
 
 from .. import config
 from ..physics_sim import space_builder, block
-from ..renderer import pygame_renderer, overlays
+from ..renderer import pygame_renderer, overlays, vfx
 from ..audio import sound_manager
 from ..video_export import moviepy_exporter
 
@@ -62,6 +62,10 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
     prev_second = config.TIME_LIMIT + 1
     final_remaining = None
 
+    impact_fx: dict[pymunk.Body, float] = {}
+    confetti_particles: list[vfx.ConfettiParticle] = []
+    glow_time = 0.0
+
     # Next time (in seconds) a new block should be dropped
     next_drop_time = 0.0
 
@@ -76,6 +80,10 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
         first_contact = getattr(arbiter, "is_first_contact", False)
         if first_contact and strength >= IMPACT_THRESHOLD:
             events.append((sim_time["t"], "impact"))
+            for shape in arbiter.shapes:
+                body = shape.body
+                if body.body_type == pymunk.Body.DYNAMIC:
+                    impact_fx[body] = config.IMPACT_FLASH_DURATION
         return True
 
     if hasattr(space, "on_collision"):
@@ -145,6 +153,15 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
         space.step(1 / config.FPS)
         space_builder.apply_bug_forces(space)
         space_builder.apply_adhesion_forces(space)
+
+        for body in list(impact_fx.keys()):
+            impact_fx[body] -= 1 / config.FPS
+            if impact_fx[body] <= 0:
+                impact_fx.pop(body)
+
+        vfx.update_confetti(confetti_particles, 1 / config.FPS)
+        if glow_time > 0:
+            glow_time -= 1 / config.FPS
 
         dynamic_bodies = [
             b
@@ -216,6 +233,13 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
                     events.append((sim_time["t"], "victory"))
                     remaining_challenge = sim_time["t"] - config.INTRO_DURATION
                     final_remaining = max(0.0, config.TIME_LIMIT - remaining_challenge)
+                    confetti_particles.extend(
+                        vfx.spawn_confetti(
+                            config.CONFETTI_COUNT,
+                            config.HEIGHT - spawn_y,
+                        )
+                    )
+                    glow_time = config.GLOW_DURATION
                     break
         crane_x = (
             config.WIDTH // 2
@@ -226,7 +250,21 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
             min(config.WIDTH - config.CRANE_MOVEMENT_BOUNDS, crane_x),
         )
         show_preview = preview_variant if t >= preview_hidden_until else None
-        pygame_renderer.render_frame(screen, space, assets, crane_x, sky, show_preview)
+        effects = {
+            b: (config.IMPACT_FLASH_COLOR, int(config.IMPACT_FLASH_ALPHA * (v / config.IMPACT_FLASH_DURATION)))
+            for b, v in impact_fx.items()
+        }
+        pygame_renderer.render_frame(
+            screen,
+            space,
+            assets,
+            crane_x,
+            sky,
+            show_preview,
+            block_effects=effects,
+            confetti=confetti_particles,
+            glow_alpha=int(config.GLOW_ALPHA * max(0.0, glow_time) / config.GLOW_DURATION),
+        )
         overlays.draw_timer(screen, remaining)
         arr = pygame.surfarray.array3d(screen)
         arr = np.transpose(arr, (1, 0, 2))
@@ -241,7 +279,30 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
         space.step(1 / config.FPS)
         space_builder.apply_bug_forces(space)
         space_builder.apply_adhesion_forces(space)
-        arr = pygame_renderer.render_frame(screen, space, assets, crane_x, sky, None)
+        for body in list(impact_fx.keys()):
+            impact_fx[body] -= 1 / config.FPS
+            if impact_fx[body] <= 0:
+                impact_fx.pop(body)
+
+        vfx.update_confetti(confetti_particles, 1 / config.FPS)
+        if glow_time > 0:
+            glow_time -= 1 / config.FPS
+
+        effects = {
+            b: (config.IMPACT_FLASH_COLOR, int(config.IMPACT_FLASH_ALPHA * (v / config.IMPACT_FLASH_DURATION)))
+            for b, v in impact_fx.items()
+        }
+        arr = pygame_renderer.render_frame(
+            screen,
+            space,
+            assets,
+            crane_x,
+            sky,
+            None,
+            block_effects=effects,
+            confetti=confetti_particles,
+            glow_alpha=int(config.GLOW_ALPHA * max(0.0, glow_time) / config.GLOW_DURATION),
+        )
         show_remaining = 0 if final_remaining is None else final_remaining
         overlays.draw_timer(screen, show_remaining)
         if state == "victory":

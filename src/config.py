@@ -199,3 +199,28 @@ ASSET_PATHS = {
 }
 
 OUTPUT_DIR = "output"
+
+# --- VFX configuration ---
+# Duration of a color flash after an impact (seconds)
+IMPACT_FLASH_DURATION = 0.2
+# Maximum opacity used for the flash overlay
+IMPACT_FLASH_ALPHA = 200
+# Tint color applied during an impact flash
+IMPACT_FLASH_COLOR = (255, 160, 40)
+
+# Confetti parameters displayed on victory
+CONFETTI_COUNT = 40
+CONFETTI_COLORS = [
+    (255, 0, 0),
+    (0, 255, 0),
+    (0, 150, 255),
+    (255, 255, 0),
+    (255, 0, 200),
+]
+CONFETTI_LIFETIME = 1.0
+CONFETTI_GRAVITY = 400
+
+# Glow overlay shown when the tower is completed
+GLOW_DURATION = 1.0
+GLOW_COLOR = (255, 255, 0)
+GLOW_ALPHA = 80

@@ -47,6 +47,10 @@ vidéos produire en appelant directement le script :
 python src/batch/batch_generate.py --count 5
 ```
 
+Chaque vidéo est générée dans un sous‑processus distinct pour éviter
+l'accumulation de mémoire. Utilisez `--no-subprocess` pour revenir à
+l'ancien comportement si besoin.
+
 Vous pouvez désactiver la bande son avec l'option `--no-audio` :
 
 ```bash

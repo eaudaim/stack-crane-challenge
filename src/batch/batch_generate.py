@@ -70,7 +70,13 @@ def find_connected_tower(resting: list[pymunk.Body], spawn_y: float, space) -> l
     return list(connected)
 
 
-def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -> None:
+def generate_once(
+    index: int,
+    assets,
+    sounds=None,
+    seed: Optional[int] = None,
+    perfect_stack: bool | None = None,
+) -> None:
     """Generate a single video with random parameters."""
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
     space = space_builder.init_space()
@@ -80,10 +86,17 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
     rng = random.Random(seed)
     sky = rng.choice(config.SKY_OPTIONS)
     crane_x = config.WIDTH // 2
+    if perfect_stack is None:
+        perfect_stack = config.PERFECT_STACK
     # Oscillation parameters for the crane movement
-    amplitude = rng.uniform(*config.CRANE_OSC_AMPLITUDE_RANGE)
-    frequency = rng.uniform(*config.CRANE_OSC_FREQUENCY_RANGE)
-    phase = rng.uniform(*config.CRANE_OSC_PHASE_RANGE)
+    if perfect_stack:
+        amplitude = 0.0
+        frequency = 0.0
+        phase = 0.0
+    else:
+        amplitude = rng.uniform(*config.CRANE_OSC_AMPLITUDE_RANGE)
+        frequency = rng.uniform(*config.CRANE_OSC_FREQUENCY_RANGE)
+        phase = rng.uniform(*config.CRANE_OSC_PHASE_RANGE)
     spawn_y = config.HEIGHT - config.CRANE_DROP_HEIGHT
     state = None  # "victory" or "fail"
     # Track the current simulation time so collision callbacks can timestamp
@@ -168,9 +181,13 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
                 events.append((config.INTRO_DURATION + t, "timer"))
             prev_second = secs
         if state is None and t >= next_drop_time:
-            drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
-            crane_vx = amplitude * frequency * math.cos(frequency * t + phase)
-            initial_vx = crane_vx * config.DROP_HORIZONTAL_SPEED_FACTOR
+            if perfect_stack:
+                drop_x = crane_x
+                initial_vx = 0.0
+            else:
+                drop_x = crane_x + random.randint(*config.DROP_VARIATION_RANGE)
+                crane_vx = amplitude * frequency * math.cos(frequency * t + phase)
+                initial_vx = crane_vx * config.DROP_HORIZONTAL_SPEED_FACTOR
             new_block = block.create_block(
                 space,
                 drop_x,
@@ -417,12 +434,17 @@ def generate_once(index: int, assets, sounds=None, seed: Optional[int] = None) -
     moviepy_exporter.export_video(frames, audio, output)
 
 
-def main(count: int, with_audio: bool = True, seed: Optional[int] = None) -> None:
+def main(
+    count: int,
+    with_audio: bool = True,
+    seed: Optional[int] = None,
+    perfect_stack: bool | None = None,
+) -> None:
     assets = pygame_renderer.load_assets()
     sounds = sound_manager.load_sounds() if with_audio else None
     for i in range(count):
         run_seed = None if seed is None else seed + i
-        generate_once(i, assets, sounds, seed=run_seed)
+        generate_once(i, assets, sounds, seed=run_seed, perfect_stack=perfect_stack)
 
 
 if __name__ == "__main__":
@@ -437,5 +459,15 @@ if __name__ == "__main__":
         default=None,
         help="Base random seed for reproducible runs",
     )
+    parser.add_argument(
+        "--perfect-stack",
+        action="store_true",
+        help="Empile automatiquement les blocs sans mouvement de grue",
+    )
     args = parser.parse_args()
-    main(args.count, not args.no_audio, seed=args.seed)
+    main(
+        args.count,
+        not args.no_audio,
+        seed=args.seed,
+        perfect_stack=args.perfect_stack,
+    )

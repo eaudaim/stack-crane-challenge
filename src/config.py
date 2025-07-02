@@ -58,6 +58,14 @@ BUG_SPIN_VELOCITY = 0.0
 # sert à réduire les glissements indésirables.
 BLOCK_ADHESION_FORCE = 3
 
+# ---------------------------------------------------------------------------
+# Options de debug / test
+# ---------------------------------------------------------------------------
+# Lorsque ``PERFECT_STACK`` est activé, la grue reste immobile et chaque bloc
+# est lâché exactement à la verticale afin de faciliter les tests dépendant de
+# la condition de victoire.
+PERFECT_STACK = False
+
 
 # ============================================================================
 # Paramètres de génération et de déplacement des blocs

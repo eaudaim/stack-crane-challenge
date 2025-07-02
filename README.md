@@ -60,6 +60,13 @@ Vous pouvez désactiver la bande son avec l'option `--no-audio` :
 python src/batch/batch_generate.py --no-audio
 ```
 
+Pour faciliter les tests d'animations déclenchées par la victoire, il est
+possible de forcer un empilement parfait en activant `--perfect-stack` :
+
+```bash
+python src/batch/batch_generate.py --perfect-stack
+```
+
 Les paramètres généraux (dimensions, durée, vitesses, palettes…) sont définis dans `src/config.py` et peuvent être ajustés
 selon vos besoins.
 Un paramètre `BLOCK_DROP_JITTER` permet également d'introduire une légère

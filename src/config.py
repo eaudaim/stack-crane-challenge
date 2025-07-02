@@ -248,3 +248,24 @@ CONFETTI_GRAVITY = 400
 GLOW_DURATION = 1.0
 GLOW_COLOR = (255, 255, 0)
 GLOW_ALPHA = 80
+
+# ============================================================================
+# Paramètres de mouvement de la caméra
+# ============================================================================
+
+# Activer ou non les effets de caméra (shake, zoom, oscillation)
+CAMERA_EFFECTS_ENABLED = True
+
+# Durée (en secondes) du shake appliqué lors d'un impact
+CAMERA_SHAKE_DURATION = 0.3
+# Amplitude maximale du shake en pixels
+CAMERA_SHAKE_INTENSITY = 8
+
+# Facteur de zoom appliqué lors d'une victoire (0.1 = +10%)
+VICTORY_ZOOM_FACTOR = 0.1
+# Durée du zoom de victoire (secondes)
+VICTORY_ZOOM_DURATION = 1.2
+
+# Oscillation douce de la caméra pendant la partie
+CAMERA_OSC_AMPLITUDE_RANGE = (5, 10)
+CAMERA_OSC_FREQUENCY_RANGE = (0.03, 0.07)

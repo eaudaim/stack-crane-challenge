@@ -115,3 +115,24 @@ def render_frame(
         surface.blit(overlay, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
     arr = pygame.surfarray.array3d(surface)
     return np.transpose(arr, (1, 0, 2))
+
+
+def apply_camera(surface: pygame.Surface, offset=(0.0, 0.0), zoom: float = 1.0) -> pygame.Surface:
+    """Return a new surface with the camera transform applied."""
+    if not config.CAMERA_EFFECTS_ENABLED or (offset == (0.0, 0.0) and zoom == 1.0):
+        return surface.copy()
+
+    if zoom != 1.0:
+        w = int(config.WIDTH * zoom)
+        h = int(config.HEIGHT * zoom)
+        transformed = pygame.transform.smoothscale(surface, (w, h))
+    else:
+        transformed = surface.copy()
+    result = pygame.Surface((config.WIDTH, config.HEIGHT))
+    rect = transformed.get_rect()
+    rect.center = (
+        config.WIDTH // 2 + int(offset[0]),
+        config.HEIGHT // 2 + int(offset[1]),
+    )
+    result.blit(transformed, rect)
+    return result

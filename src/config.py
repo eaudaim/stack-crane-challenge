@@ -1,6 +1,7 @@
 """Global configuration constants for Stack Crane Challenge."""
 
 import os
+import math
 
 WIDTH = 1080
 HEIGHT = 1920
@@ -75,6 +76,14 @@ PREVIEW_HIDE_DURATION = 1.0
 
 # Horizontal margin used for crane movement limits
 CRANE_MOVEMENT_BOUNDS = 340
+
+# Oscillating crane movement parameters
+CRANE_OSC_AMPLITUDE_RANGE = (
+    80,
+    WIDTH // 2 - CRANE_MOVEMENT_BOUNDS,
+)
+CRANE_OSC_FREQUENCY_RANGE = (0.4, 0.8)
+CRANE_OSC_PHASE_RANGE = (0.0, 2 * math.pi)
 
 # Random variation applied to the drop X position
 DROP_VARIATION_RANGE = (-10, 10)

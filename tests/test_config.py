@@ -16,3 +16,9 @@ def test_basic_constants():
     assert config.BLOCK_SIDE_ANGLE > 0
     assert config.BLOCK_ADHESION_FORCE >= 0
     assert isinstance(config.CAMERA_EFFECTS_ENABLED, bool)
+
+
+def test_sound_enabled_dict():
+    assert isinstance(config.SOUND_ENABLED, dict)
+    assert "bpm_loop" in config.SOUND_ENABLED
+    assert all(isinstance(v, bool) for v in config.SOUND_ENABLED.values())

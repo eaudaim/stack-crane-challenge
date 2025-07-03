@@ -280,6 +280,25 @@ ASSET_PATHS = {
 OUTPUT_DIR = "output"
 
 # ============================================================================
+# Paramètres audio
+# ============================================================================
+
+SOUND_ENABLED = {
+    "applause": True,
+    "bpm_loop": True,
+    "crash": True,
+    "fail": True,
+    "impact": True,
+    "impact1": True,
+    "impact2": True,
+    "impact3": True,
+    "pulley": True,
+    "timer": True,
+    "victory": True,
+    "win_music": True,
+}
+
+# ============================================================================
 # Configuration des effets visuels (VFX)
 # ============================================================================
 

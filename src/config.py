@@ -288,6 +288,8 @@ SOUND_ENABLED = {
     "bpm_loop": True,
     "crash": True,
     "fail": True,
+    "fail_crowd": True,
+    "fail_trumpet": True,
     "impact": True,
     "impact1": True,
     "impact2": True,

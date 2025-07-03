@@ -43,6 +43,8 @@ def mix_tracks(duration: int, events: List[Tuple[float, str]], sounds: Dict[str,
             to_play.append(choice)
         elif name == "victory":
             to_play.extend(["victory", "win_music", "applause"])
+        elif name == "fail":
+            to_play.extend(["fail", "fail_crowd", "fail_trumpet"])
         elif name in sounds:
             to_play.append(name)
 

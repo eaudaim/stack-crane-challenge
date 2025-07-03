@@ -19,7 +19,7 @@ INTRO_DURATION = 3
 
 # Durée totale du défi. Si la tour n'atteint pas la hauteur requise avant la
 # fin du compte à rebours, la partie est perdue.
-TIME_LIMIT = 60
+TIME_LIMIT = 8
 
 # Durée totale utilisée lors de l'export vidéo (intro + défi + marge finale)
 DURATION = INTRO_DURATION + TIME_LIMIT + 3
@@ -169,8 +169,8 @@ PALETTES = {
     },
     # Tons chauds pour la fin d'après-midi
     "dusk": {
-        "text": (255, 220, 180),
-        "shadow": (120, 60, 20),
+        "text": (255, 200, 140),
+        "shadow": (30, 15, 0),
     },
     # Palette cyan lumineuse pour un rendu néon
     "night": {
@@ -216,8 +216,8 @@ INTRO_STYLES = {
     # Style sans serif blanc épuré pour la journée
     "day": {
         "font_name": "montserratbold",
-        "font_size": 110,
-        "y_pos": HEIGHT // 4,
+        "font_size": 100,
+        "y_pos": HEIGHT // 2,
         "shadow_offset": (3, 3),
         "palette": "day",
         "effect": "flat",
@@ -225,27 +225,27 @@ INTRO_STYLES = {
     # Style vintage avec Slab Serif pour le crépuscule
     "dusk": {
         "font_name": "rockwell",
-        "font_size": 110,
-        "y_pos": HEIGHT // 4,
-        "shadow_offset": (4, 4),
+        "font_size": 100,
+        "y_pos": HEIGHT // 2,
+        "shadow_offset": (7, 7),
         "palette": "dusk",
         "effect": "vintage",
     },
     # Style néon accentué pour la nuit
     "night": {
         "font_name": "neon tubes",
-        "font_size": 110,
-        "y_pos": HEIGHT // 4,
+        "font_size": 100,
+        "y_pos": HEIGHT // 2,
         "shadow_offset": (6, 6),
         "palette": "night",
-        "effect": "neon",
+        "effect": "vintage",
     },
 }
 
 # Texte affiché au début de la vidéo et ses options de style
 INTRO_TEXT = "TERMINE CETTE TOUR EN 60s"
 INTRO_STYLE = {
-    "font_size": 100,
+    "font_size": 110,
     # Position verticale du texte (plus la valeur est petite, plus le texte est haut)
     "y_pos": HEIGHT // 4,
     "shadow_offset": (4, 4),

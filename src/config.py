@@ -19,7 +19,7 @@ INTRO_DURATION = 3
 
 # Durée totale du défi. Si la tour n'atteint pas la hauteur requise avant la
 # fin du compte à rebours, la partie est perdue.
-TIME_LIMIT = 60
+TIME_LIMIT = 10
 
 # ============================================================================
 # Paramètres liés aux blocs
@@ -294,7 +294,7 @@ SOUND_ENABLED = {
     "applause": True,
     "bpm_loop": True,
     "crash": True,
-    "fail": True,
+    "fail": False,
     "fail_crowd": True,
     "fail_trumpet": True,
     "impact": True,

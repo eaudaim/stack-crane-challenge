@@ -21,9 +21,6 @@ INTRO_DURATION = 3
 # fin du compte à rebours, la partie est perdue.
 TIME_LIMIT = 8
 
-# Durée totale utilisée lors de l'export vidéo (intro + défi + marge finale)
-DURATION = INTRO_DURATION + TIME_LIMIT + 3
-
 # ============================================================================
 # Paramètres liés aux blocs
 # ============================================================================
@@ -134,6 +131,9 @@ BLOCK_DROP_JITTER = 0.4
 # ============================================================================
 # Palettes de couleurs et styles d'introduction
 # ============================================================================
+# Couleur et largeur du liseré appliqué autour des textes
+TEXT_OUTLINE_COLOR = (0, 0, 0)
+TEXT_OUTLINE_WIDTH = 0
 #
 # "timer" reprend les couleurs du compte à rebours. Les autres palettes
 # permettent de styliser le texte d'intro avec différents rendus.

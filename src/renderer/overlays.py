@@ -18,6 +18,8 @@ def render_flat_text(
     shadow_color: tuple[int, int, int],
     pos: tuple[int, int],
     offset: tuple[int, int],
+    outline_color: tuple[int, int, int] = config.TEXT_OUTLINE_COLOR,
+    outline_width: int = config.TEXT_OUTLINE_WIDTH,
 ) -> None:
     """Render text with a simple drop shadow."""
 
@@ -26,6 +28,15 @@ def render_flat_text(
     rendered = font.render(text, True, text_color)
     shadow = font.render(text, True, shadow_color)
     surface.blit(shadow, (x + dx, y + dy))
+    if outline_width > 0:
+        outline = font.render(text, True, outline_color)
+        for ox in range(-outline_width, outline_width + 1):
+            for oy in range(-outline_width, outline_width + 1):
+                if ox == 0 and oy == 0:
+                    continue
+                if ox * ox + oy * oy > outline_width * outline_width:
+                    continue
+                surface.blit(outline, (x + ox, y + oy))
     surface.blit(rendered, (x, y))
 
 
@@ -37,6 +48,8 @@ def render_neon_text(
     shadow_color: tuple[int, int, int],
     pos: tuple[int, int],
     offset: tuple[int, int],
+    outline_color: tuple[int, int, int] = config.TEXT_OUTLINE_COLOR,
+    outline_width: int = config.TEXT_OUTLINE_WIDTH,
 ) -> None:
     """Render text with a neon glow effect."""
 
@@ -60,6 +73,16 @@ def render_neon_text(
         gy = y - (glow.get_height() - base.get_height()) // 2
         surface.blit(glow, (gx, gy), special_flags=pygame.BLEND_RGBA_ADD)
 
+    if outline_width > 0:
+        outline = font.render(text, True, outline_color)
+        for ox in range(-outline_width, outline_width + 1):
+            for oy in range(-outline_width, outline_width + 1):
+                if ox == 0 and oy == 0:
+                    continue
+                if ox * ox + oy * oy > outline_width * outline_width:
+                    continue
+                surface.blit(outline, (x + ox, y + oy))
+
     surface.blit(base, (x, y))
 
 
@@ -71,6 +94,8 @@ def render_vintage_text(
     shadow_color: tuple[int, int, int],
     pos: tuple[int, int],
     offset: tuple[int, int],
+    outline_color: tuple[int, int, int] = config.TEXT_OUTLINE_COLOR,
+    outline_width: int = config.TEXT_OUTLINE_WIDTH,
 ) -> None:
     """Render text with a vintage look (soft shadow and slight grain)."""
 
@@ -111,6 +136,16 @@ def render_vintage_text(
         noise.set_at((nx, ny), (0, 0, 0, alpha))
     base.blit(noise, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
 
+    if outline_width > 0:
+        outline = font.render(text, True, outline_color)
+        for ox in range(-outline_width, outline_width + 1):
+            for oy in range(-outline_width, outline_width + 1):
+                if ox == 0 and oy == 0:
+                    continue
+                if ox * ox + oy * oy > outline_width * outline_width:
+                    continue
+                surface.blit(outline, (x + ox, y + oy))
+
     surface.blit(base, (x, y))
 
 
@@ -135,18 +170,50 @@ def draw_intro(surface: pygame.Surface, text: str | None = None, style_name: str
     palette = config.PALETTES.get(style.get("palette", "default"), {})
     text_color = palette.get("text", (255, 255, 255))
     shadow_color = palette.get("shadow", (0, 0, 0))
+    outline_color = palette.get("outline", config.TEXT_OUTLINE_COLOR)
     size = font.size(text)
     x = (config.WIDTH - size[0]) // 2
     y = style.get("y_pos", config.HEIGHT // 3)
     dx, dy = style.get("shadow_offset", (2, 2))
+    outline_width = style.get("outline_width", config.TEXT_OUTLINE_WIDTH)
 
     effect = style.get("effect", "flat")
     if effect == "neon":
-        render_neon_text(surface, text, font, text_color, shadow_color, (x, y), (dx, dy))
+        render_neon_text(
+            surface,
+            text,
+            font,
+            text_color,
+            shadow_color,
+            (x, y),
+            (dx, dy),
+            outline_color,
+            outline_width,
+        )
     elif effect == "vintage":
-        render_vintage_text(surface, text, font, text_color, shadow_color, (x, y), (dx, dy))
+        render_vintage_text(
+            surface,
+            text,
+            font,
+            text_color,
+            shadow_color,
+            (x, y),
+            (dx, dy),
+            outline_color,
+            outline_width,
+        )
     else:
-        render_flat_text(surface, text, font, text_color, shadow_color, (x, y), (dx, dy))
+        render_flat_text(
+            surface,
+            text,
+            font,
+            text_color,
+            shadow_color,
+            (x, y),
+            (dx, dy),
+            outline_color,
+            outline_width,
+        )
 
 
 def _draw_centered(surface: pygame.Surface, text: str, color, size: int = 96) -> None:
@@ -158,6 +225,15 @@ def _draw_centered(surface: pygame.Surface, text: str, color, size: int = 96) ->
     x = (config.WIDTH - rendered.get_width()) // 2
     y = (config.HEIGHT - rendered.get_height()) // 2
     surface.blit(shadow, (x + 2, y + 2))
+    if config.TEXT_OUTLINE_WIDTH > 0:
+        outline = font.render(text, True, config.TEXT_OUTLINE_COLOR)
+        for ox in range(-config.TEXT_OUTLINE_WIDTH, config.TEXT_OUTLINE_WIDTH + 1):
+            for oy in range(-config.TEXT_OUTLINE_WIDTH, config.TEXT_OUTLINE_WIDTH + 1):
+                if ox == 0 and oy == 0:
+                    continue
+                if ox * ox + oy * oy > config.TEXT_OUTLINE_WIDTH * config.TEXT_OUTLINE_WIDTH:
+                    continue
+                surface.blit(outline, (x + ox, y + oy))
     surface.blit(rendered, (x, y))
 
 
@@ -182,5 +258,14 @@ def draw_timer(surface: pygame.Surface, remaining: float) -> None:
     rendered = font.render(text, True, color)
     shadow = font.render(text, True, config.PALETTES["default"]["shadow"])
     surface.blit(shadow, (12, 12))
+    if config.TEXT_OUTLINE_WIDTH > 0:
+        outline = font.render(text, True, config.TEXT_OUTLINE_COLOR)
+        for ox in range(-config.TEXT_OUTLINE_WIDTH, config.TEXT_OUTLINE_WIDTH + 1):
+            for oy in range(-config.TEXT_OUTLINE_WIDTH, config.TEXT_OUTLINE_WIDTH + 1):
+                if ox == 0 and oy == 0:
+                    continue
+                if ox * ox + oy * oy > config.TEXT_OUTLINE_WIDTH * config.TEXT_OUTLINE_WIDTH:
+                    continue
+                surface.blit(outline, (10 + ox, 10 + oy))
     surface.blit(rendered, (10, 10))
 

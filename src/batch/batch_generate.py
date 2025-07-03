@@ -382,7 +382,14 @@ def generate_once(
         final_remaining = 0
         events.append((sim_time["t"], "fail"))
 
-    for _ in range(config.FPS * 2):
+    end_duration = config.END_SCREEN_DURATION
+    if state == "fail" and sounds and "fail_crowd" in sounds:
+        crowd_len = len(sounds["fail_crowd"]) / 1000.0
+        end_duration = max(end_duration, crowd_len + 1)
+
+    end_frames = math.ceil(end_duration * config.FPS)
+
+    for _ in range(end_frames):
         sim_time["t"] += 1 / config.FPS
         if not freeze_scene:
             space.step(1 / config.FPS)
@@ -448,7 +455,7 @@ def generate_once(
         arr = np.transpose(arr, (1, 0, 2))
         frames.append(arr)
 
-    duration = config.INTRO_DURATION + config.TIME_LIMIT + 2
+    duration = config.INTRO_DURATION + config.TIME_LIMIT + end_frames / config.FPS
     if sounds:
         audio = sound_manager.mix_tracks(duration, events, sounds)
     else:

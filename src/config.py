@@ -19,7 +19,7 @@ INTRO_DURATION = 3
 
 # Durée totale du défi. Si la tour n'atteint pas la hauteur requise avant la
 # fin du compte à rebours, la partie est perdue.
-TIME_LIMIT = 8
+TIME_LIMIT = 60
 
 # ============================================================================
 # Paramètres liés aux blocs
@@ -133,7 +133,7 @@ BLOCK_DROP_JITTER = 0.4
 # ============================================================================
 # Couleur et largeur du liseré appliqué autour des textes
 TEXT_OUTLINE_COLOR = (0, 0, 0)
-TEXT_OUTLINE_WIDTH = 0
+TEXT_OUTLINE_WIDTH = 5
 #
 # "timer" reprend les couleurs du compte à rebours. Les autres palettes
 # permettent de styliser le texte d'intro avec différents rendus.

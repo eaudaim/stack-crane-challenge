@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from typing import Dict, List, Tuple
+import random
 
 from pydub import AudioSegment
 
@@ -22,7 +23,19 @@ def mix_tracks(duration: int, events: List[Tuple[float, str]], sounds: Dict[str,
     loops = int((duration * 1000) / len(base)) + 1
     backing = base * loops
     track = backing[: duration * 1000]
+    impact_variants = [n for n in sounds if n.startswith("impact")]
+    prev_impact: str | None = None
     for ts, name in events:
-        if name in sounds:
-            track = track.overlay(sounds[name], position=int(ts * 1000))
+        segment = None
+        if name == "impact" and impact_variants:
+            options = impact_variants.copy()
+            if prev_impact in options and len(options) > 1:
+                options.remove(prev_impact)
+            choice = random.choice(options)
+            prev_impact = choice
+            segment = sounds[choice]
+        elif name in sounds:
+            segment = sounds[name]
+        if segment is not None:
+            track = track.overlay(segment, position=int(ts * 1000))
     return track
